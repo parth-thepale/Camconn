@@ -359,54 +359,6 @@ export const ReportIssue: React.FC<ReportIssueProps> = ({
             </div>
           </div>
 
-          {/* Quick Prompts */}
-          <div style={{ marginBottom: '20px' }}>
-            <span style={{ fontSize: '0.75rem', color: 'var(--md-sys-color-outline)', marginRight: '8px' }}>
-              Example presets:
-            </span>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '6px' }}>
-              <button
-                type="button"
-                className="md3-chip"
-                style={{ cursor: 'pointer', background: 'var(--cat-plumbing-container)', color: 'var(--cat-plumbing-on-container)' }}
-                onClick={() => {
-                  setComplaintText('Water is leaking heavily under the handwash sink in the 2nd floor restroom.');
-                  setBuilding('CV Raman Science Centre');
-                  setFloor('2nd Floor');
-                  setRoom('Restroom 201');
-                }}
-              >
-                💧 Plumbing Leak
-              </button>
-              <button
-                type="button"
-                className="md3-chip"
-                style={{ cursor: 'pointer', background: 'var(--cat-electricity-container)', color: 'var(--cat-electricity-on-container)' }}
-                onClick={() => {
-                  setComplaintText('Main switchboard se sparks nikal rahe hain aur switchboard buzz kar raha hai LH 204 me.');
-                  setBuilding('Aryabhata Academic Block');
-                  setFloor('2nd Floor');
-                  setRoom('LH 204');
-                }}
-              >
-                ⚡ Sparks in Switchboard (Hindi)
-              </button>
-              <button
-                type="button"
-                className="md3-chip"
-                style={{ cursor: 'pointer', background: 'var(--cat-internet-container)', color: 'var(--cat-internet-on-container)' }}
-                onClick={() => {
-                  setComplaintText('Campus Wi-Fi keeps disconnecting every two minutes in the quiet study zone. DHCP failure.');
-                  setBuilding('Central Library');
-                  setFloor('1st Floor');
-                  setZone('East Quiet Reading Area');
-                }}
-              >
-                🌐 Wi-Fi Outage
-              </button>
-            </div>
-          </div>
-
           {/* Location Selection */}
           <div
             style={{

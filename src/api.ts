@@ -85,12 +85,6 @@ export async function fetchCurrentUser(): Promise<User | null> {
   }
 }
 
-export async function fetchDemoAccounts(): Promise<Array<{ email: string; password: string; name: string; role: string }>> {
-  const res = await fetch(`${API_BASE}/auth/demo-users`);
-  const data = await res.json();
-  return data.demoAccounts || [];
-}
-
 // System API
 export async function fetchHealth(): Promise<{
   status: string;
@@ -322,8 +316,4 @@ export async function processPayment(params: {
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || 'Payment processing failed');
   return data;
-}
-
-export async function resetDemoDataset(): Promise<void> {
-  await fetch(`${API_BASE}/reset-demo`, { method: 'POST', headers: authHeaders() });
 }

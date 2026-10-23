@@ -41,7 +41,7 @@ export const RoutingGuideModal: React.FC<RoutingGuideModalProps> = ({ onClose })
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <BookOpen size={20} color="var(--md-sys-color-primary)" />
             <h3 style={{ fontSize: '1.125rem', fontWeight: 600 }}>
-              Campus Facilities Routing Guide & Provenance
+              Campus Facilities Routing Directory & Service Standards
             </h3>
           </div>
           <button
@@ -72,8 +72,7 @@ export const RoutingGuideModal: React.FC<RoutingGuideModalProps> = ({ onClose })
         >
           <Info size={18} />
           <span>
-            These illustrative rules govern deterministic category classification and
-            departmental assignment for the 24-hour campus MVP.
+            These official routing guidelines determine departmental ownership, priority triage, and response protocols.
           </span>
         </div>
 
@@ -105,9 +104,10 @@ export const RoutingGuideModal: React.FC<RoutingGuideModalProps> = ({ onClose })
                     padding: '2px 8px',
                     borderRadius: 'var(--md-sys-shape-corner-xs)',
                     color: 'var(--md-sys-color-on-surface-variant)',
+                    fontWeight: 600,
                   }}
                 >
-                  Demo Rule (Replaceable)
+                  Standard Operating Protocol
                 </span>
               </div>
 

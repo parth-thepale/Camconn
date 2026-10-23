@@ -8,7 +8,7 @@ export const systemRouter = Router();
  * GET /api/health
  * Health check & runtime diagnostics
  */
-systemRouter.get('/health', (req, res) => {
+systemRouter.get('/health', (_req, res) => {
   const tickets = storage.getTickets();
   res.json({
     status: 'healthy',
@@ -24,9 +24,9 @@ systemRouter.get('/health', (req, res) => {
 
 /**
  * GET /api/routing-rules
- * Get campus routing guide & explainable provenance
+ * Get official campus routing directory & provenance standards
  */
-systemRouter.get('/routing-rules', (req, res) => {
+systemRouter.get('/routing-rules', (_req, res) => {
   res.json({
     success: true,
     rules: storage.getRoutingRules(),
@@ -37,21 +37,9 @@ systemRouter.get('/routing-rules', (req, res) => {
  * GET /api/campus-locations
  * Campus directory buildings and zones
  */
-systemRouter.get('/campus-locations', (req, res) => {
+systemRouter.get('/campus-locations', (_req, res) => {
   res.json({
     success: true,
     locations: CAMPUS_LOCATIONS,
-  });
-});
-
-/**
- * POST /api/reset-demo
- * Reset database to default seed data for presentation/judging walkthrough
- */
-systemRouter.post('/reset-demo', (req, res) => {
-  storage.resetSeed();
-  res.json({
-    success: true,
-    message: 'Demo dataset reset successfully',
   });
 });

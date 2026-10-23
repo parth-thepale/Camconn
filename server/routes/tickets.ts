@@ -3,23 +3,11 @@ import { z } from 'zod';
 import { ticketService } from '../services/ticketService.js';
 import { storage } from '../services/storage.js';
 import { duplicateService } from '../services/duplicateService.js';
-import { AuthenticatedRequest, verifyToken } from '../services/auth.js';
+import { requireAuth, AuthenticatedRequest } from '../services/auth.js';
 
 export const ticketRouter = Router();
 
-// Middleware to extract optional user from bearer header if present
-ticketRouter.use((req: AuthenticatedRequest, _res, next) => {
-  const auth = req.headers.authorization;
-  if (auth && auth.startsWith('Bearer ')) {
-    const decoded = verifyToken(auth.split(' ')[1]);
-    if (decoded) req.user = decoded;
-  }
-  next();
-});
-
 const CreateTicketSchema = z.object({
-  createdBy: z.string().optional(),
-  creatorName: z.string().optional(),
   originalText: z.string().min(5),
   title: z.string().min(3),
   summary: z.string().min(5),
@@ -54,9 +42,9 @@ const CreateTicketSchema = z.object({
 
 /**
  * POST /api/tickets
- * Create a confirmed ticket with persistent reference number and optional checkout linkage
+ * Create a confirmed ticket - Strictly student role
  */
-ticketRouter.post('/', (req: AuthenticatedRequest, res) => {
+ticketRouter.post('/', requireAuth(['student']), (req: AuthenticatedRequest, res) => {
   const parsed = CreateTicketSchema.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({
@@ -67,8 +55,8 @@ ticketRouter.post('/', (req: AuthenticatedRequest, res) => {
   }
 
   const payload = parsed.data;
-  const createdBy = req.user?.id || payload.createdBy || 'student-ananya';
-  const creatorName = req.user?.name || payload.creatorName || 'Student Reporter';
+  const createdBy = req.user!.id;
+  const creatorName = req.user!.name;
 
   try {
     const ticket = ticketService.createTicket({
@@ -77,7 +65,6 @@ ticketRouter.post('/', (req: AuthenticatedRequest, res) => {
       creatorName,
     });
 
-    // Check for duplicate candidates in background and flag if any found
     const candidates = duplicateService.findCandidates(ticket.id);
     if (candidates.length > 0) {
       storage.updateTicket(ticket.id, { hasDuplicateCandidates: true });
@@ -99,13 +86,11 @@ ticketRouter.post('/', (req: AuthenticatedRequest, res) => {
 
 /**
  * GET /api/tickets/mine
- * List tickets for current student
+ * List tickets for current authenticated student only
  */
-ticketRouter.get('/mine', (req: AuthenticatedRequest, res) => {
-  const studentId = (req.query.studentId as string) || req.user?.id || 'all';
-  const tickets = storage.getTickets().filter(
-    (t) => t.createdBy === studentId || studentId === 'all'
-  );
+ticketRouter.get('/mine', requireAuth(['student']), (req: AuthenticatedRequest, res) => {
+  const studentId = req.user!.id;
+  const tickets = storage.getTickets().filter((t) => t.createdBy === studentId);
 
   res.json({
     success: true,
@@ -115,12 +100,18 @@ ticketRouter.get('/mine', (req: AuthenticatedRequest, res) => {
 
 /**
  * GET /api/tickets/:id
- * Retrieve single ticket with chronological audit timeline
+ * Retrieve single ticket with chronological audit timeline (accessible by student owner or staff/admin)
  */
-ticketRouter.get('/:id', (req, res) => {
+ticketRouter.get('/:id', requireAuth(), (req: AuthenticatedRequest, res) => {
   const ticket = storage.getTicketById(req.params.id);
   if (!ticket) {
     res.status(404).json({ error: 'Ticket not found' });
+    return;
+  }
+
+  // Access control: only creator student or staff/admin can view ticket details
+  if (req.user!.role === 'student' && ticket.createdBy !== req.user!.id) {
+    res.status(403).json({ error: 'Access denied: You can only view your own tickets.' });
     return;
   }
 

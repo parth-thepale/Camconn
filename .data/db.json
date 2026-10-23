@@ -1,5 +1,5 @@
 {
-  "nextTicketNumber": 107,
+  "nextTicketNumber": 106,
   "routingRules": [
     {
       "id": "rule-plumbing-01",
@@ -88,7 +88,7 @@
   "checkoutSessions": [
     {
       "id": "chk-test-01",
-      "ticketId": "ticket-1792776008318-93zzd",
+      "ticketId": "ticket-1792776919660-hffxo",
       "ticketReference": "CC-2026-000105",
       "amount": 499,
       "currency": "INR",
@@ -96,102 +96,45 @@
       "status": "completed",
       "paymentMethod": "CAMPUS_CARD (ending in 8821)",
       "receiptHash": "c7b5a10982df4321",
-      "paidAt": "2026-10-23T17:20:08.329Z",
-      "createdAt": "2026-10-23T17:20:08.329Z"
-    },
-    {
-      "id": "chk-test-01",
-      "ticketId": "ticket-1792776259276-ilf9v",
-      "ticketReference": "CC-2026-000106",
-      "amount": 499,
-      "currency": "INR",
-      "tier": "expedited_emergency",
-      "status": "completed",
-      "paymentMethod": "CAMPUS_CARD (ending in 8821)",
-      "receiptHash": "c7b5a10982df4321",
-      "paidAt": "2026-10-23T17:24:19.289Z",
-      "createdAt": "2026-10-23T17:24:19.289Z"
-    },
-    {
-      "id": "chk-1792776296970-m5ud",
-      "ticketReference": "CC-2026-000101",
-      "amount": 499,
-      "currency": "INR",
-      "tier": "expedited_emergency",
-      "status": "completed",
-      "paymentMethod": "CAMPUS_CARD (ending in 8841)",
-      "receiptHash": "fa78fbad4b5a8c74",
-      "createdAt": "2026-10-23T17:24:56.970Z",
-      "paidAt": "2026-10-23T17:24:56.978Z"
+      "paidAt": "2026-10-23T17:35:19.666Z",
+      "createdAt": "2026-10-23T17:35:19.666Z"
     }
   ],
   "users": [
     {
       "id": "usr-student-01",
       "email": "student@campus.edu",
-      "passwordHash": "77eae8f41d873731b71226d46452c0e2:6d269c05f3a4300c459ec059b192f8c207d610b96914cec8b750bcae1b8aac228582def73878ace12644bd250d1428db58227eb91db8dab422bc6617f32567d5",
+      "passwordHash": "1b2d0bb987bd43fa4c57bab573caa370:079224628e88064321286ff41e8240283f4dced12a50312dcdb606e4670c369551987eaae4e55b37ef93c199fa644987867510f29ac4b51cc856761d91338d2b",
       "name": "Ananya Sharma",
       "role": "student",
       "department": "Computer Science",
-      "createdAt": "2026-10-23T17:20:08.007Z"
+      "createdAt": "2026-10-23T17:35:07.896Z"
     },
     {
       "id": "usr-staff-01",
       "email": "staff@campus.edu",
-      "passwordHash": "bb00af7ce617600f507b89dc10894d18:1a629498a035eddcebb14b48bfbf20af4fb3cd90f25a3ad334254370a5b56b9b4fad09f9c724c50915673e769a1ad4fa02c5ed709361d95f6e90fa43f7209abd",
+      "passwordHash": "e8bca04bc2da8b0378aa1c4cce3a4b6e:ee7035545498dd27a9e1b50b6ab8a58758658e46d2c4ef56acf3c53a04aeb6a8e8297770b4c3545b05be91132dbbe00539ae747a755be7a012d336dd0264e2f6",
       "name": "Rajesh Kumar",
       "role": "staff",
       "department": "Facilities & Plumbing",
-      "createdAt": "2026-10-23T17:20:08.038Z"
+      "createdAt": "2026-10-23T17:35:07.938Z"
     },
     {
       "id": "usr-admin-01",
       "email": "admin@campus.edu",
-      "passwordHash": "76442d3a6ab445eb9df77e85983340de:0427c72a2688145d2779596bf53293246f112b06f037f350be86df88aa69fbf9718f4e6dea12710313301fbfc2a46cb4b6628b7c1cd8a408a3d35c50c5121fae",
+      "passwordHash": "68e8ed0a927b02c8bd0582f7686d28d4:50693039b7344c9b1ffbc555b473992614de5e8bcaf386bb647cabe31c5d830b7ec8e68623c18f0ec7d6fc0d822f8f87d366d891ab773cc6520c2e2db126d089",
       "name": "Dr. Vikram Seth",
       "role": "admin",
       "department": "Campus Facilities Administration",
-      "createdAt": "2026-10-23T17:20:08.069Z"
+      "createdAt": "2026-10-23T17:35:07.979Z"
     }
   ],
   "tickets": [
     {
-      "id": "ticket-1792776259276-ilf9v",
-      "reference": "CC-2026-000106",
-      "createdBy": "test-student-01",
-      "creatorName": "Test Student",
-      "originalText": "Severe water leak under washroom sink on 3rd floor CV Raman block.",
-      "title": "Water leak under washroom sink",
-      "summary": "Sink supply line leaking on 3rd floor washroom.",
-      "category": "plumbing",
-      "location": {
-        "building": "CV Raman Science Centre",
-        "floor": "3rd Floor",
-        "room": "Washroom 302"
-      },
-      "status": "In progress",
-      "assignedTo": "Vikram Singh (Plumber)",
-      "photoUrl": null,
-      "routingSuggestion": "Facilities / Plumbing & Water Systems",
-      "routingReason": "Matched plumbing keywords and washroom location.",
-      "clarifications": [],
-      "duplicateOf": null,
-      "hasDuplicateCandidates": false,
-      "urgencyLevel": "high",
-      "safetyWarning": "Caution: Wet floor presents immediate slip hazard.",
-      "detectedLanguage": "English",
-      "translatedText": null,
-      "paymentStatus": "paid",
-      "checkoutReference": "PAY-2026-881293",
-      "priorityTier": "expedited_emergency",
-      "createdAt": "2026-10-23T17:24:19.277Z",
-      "updatedAt": "2026-10-23T17:24:19.290Z"
-    },
-    {
-      "id": "ticket-1792776008318-93zzd",
+      "id": "ticket-1792776919660-hffxo",
       "reference": "CC-2026-000105",
-      "createdBy": "test-student-01",
-      "creatorName": "Test Student",
+      "createdBy": "usr-student-01",
+      "creatorName": "Ananya Sharma",
       "originalText": "Severe water leak under washroom sink on 3rd floor CV Raman block.",
       "title": "Water leak under washroom sink",
       "summary": "Sink supply line leaking on 3rd floor washroom.",
@@ -201,8 +144,8 @@
         "floor": "3rd Floor",
         "room": "Washroom 302"
       },
-      "status": "In progress",
-      "assignedTo": "Vikram Singh (Plumber)",
+      "status": "Acknowledged",
+      "assignedTo": null,
       "photoUrl": null,
       "routingSuggestion": "Facilities / Plumbing & Water Systems",
       "routingReason": "Matched plumbing keywords and washroom location.",
@@ -216,8 +159,8 @@
       "paymentStatus": "paid",
       "checkoutReference": "PAY-2026-881293",
       "priorityTier": "expedited_emergency",
-      "createdAt": "2026-10-23T17:20:08.320Z",
-      "updatedAt": "2026-10-23T17:20:08.331Z"
+      "createdAt": "2026-10-23T17:35:19.661Z",
+      "updatedAt": "2026-10-23T17:35:19.668Z"
     },
     {
       "id": "ticket-101",
@@ -250,8 +193,8 @@
       "detectedLanguage": "English",
       "paymentStatus": "waived",
       "priorityTier": "standard",
-      "createdAt": "2026-10-23T14:20:08.069Z",
-      "updatedAt": "2026-10-23T14:20:08.069Z"
+      "createdAt": "2026-10-23T14:35:07.979Z",
+      "updatedAt": "2026-10-23T14:35:07.979Z"
     },
     {
       "id": "ticket-102",
@@ -280,8 +223,8 @@
       "paymentStatus": "paid",
       "checkoutReference": "CHK-2026-00921",
       "priorityTier": "expedited_emergency",
-      "createdAt": "2026-10-23T09:20:08.069Z",
-      "updatedAt": "2026-10-23T15:20:08.069Z"
+      "createdAt": "2026-10-23T09:35:07.979Z",
+      "updatedAt": "2026-10-23T15:35:07.979Z"
     },
     {
       "id": "ticket-103",
@@ -309,8 +252,8 @@
       "detectedLanguage": "English",
       "paymentStatus": "waived",
       "priorityTier": "standard",
-      "createdAt": "2026-10-23T12:20:08.069Z",
-      "updatedAt": "2026-10-23T13:20:08.069Z"
+      "createdAt": "2026-10-23T12:35:07.979Z",
+      "updatedAt": "2026-10-23T13:35:07.979Z"
     },
     {
       "id": "ticket-104",
@@ -343,8 +286,8 @@
       "detectedLanguage": "English",
       "paymentStatus": "waived",
       "priorityTier": "standard",
-      "createdAt": "2026-10-23T11:20:08.069Z",
-      "updatedAt": "2026-10-23T14:20:08.069Z"
+      "createdAt": "2026-10-23T11:35:07.979Z",
+      "updatedAt": "2026-10-23T14:35:07.979Z"
     }
   ],
   "ticketEvents": [
@@ -358,7 +301,7 @@
       "actorRole": "student",
       "note": "Ticket submitted via CampusConnect intelligent reporting.",
       "isInternal": false,
-      "createdAt": "2026-10-23T14:20:08.069Z"
+      "createdAt": "2026-10-23T14:35:07.979Z"
     },
     {
       "id": "evt-102-1",
@@ -370,7 +313,7 @@
       "actorRole": "student",
       "note": "Emergency ticket created with attached location details.",
       "isInternal": false,
-      "createdAt": "2026-10-23T09:20:08.069Z"
+      "createdAt": "2026-10-23T09:35:07.979Z"
     },
     {
       "id": "evt-102-p",
@@ -381,7 +324,7 @@
       "actorRole": "student",
       "note": "Secure checkout completed for Priority Emergency Dispatch (Ref: CHK-2026-00921).",
       "isInternal": false,
-      "createdAt": "2026-10-23T10:20:08.069Z"
+      "createdAt": "2026-10-23T10:35:07.979Z"
     },
     {
       "id": "evt-102-2",
@@ -394,7 +337,7 @@
       "actorRole": "admin",
       "note": "Assigned to Rajesh Kumar for urgent electrical inspection.",
       "isInternal": false,
-      "createdAt": "2026-10-23T11:20:08.069Z"
+      "createdAt": "2026-10-23T11:35:07.979Z"
     },
     {
       "id": "evt-102-3",
@@ -407,109 +350,32 @@
       "actorRole": "staff",
       "note": "Electrician on site with multimeter and replacement choke units.",
       "isInternal": false,
-      "createdAt": "2026-10-23T15:20:08.069Z"
+      "createdAt": "2026-10-23T15:35:07.979Z"
     },
     {
-      "id": "evt-1792776008320-1",
-      "ticketId": "ticket-1792776008318-93zzd",
+      "id": "evt-1792776919662-1",
+      "ticketId": "ticket-1792776919660-hffxo",
       "type": "CREATED",
       "toStatus": "Submitted",
-      "actorId": "test-student-01",
-      "actorName": "Test Student",
+      "actorId": "usr-student-01",
+      "actorName": "Ananya Sharma",
       "actorRole": "student",
       "note": "Ticket submitted via CampusConnect intelligent reporting. Priority: EXPEDITED_EMERGENCY. Urgency: HIGH.",
       "isInternal": false,
-      "createdAt": "2026-10-23T17:20:08.320Z"
+      "createdAt": "2026-10-23T17:35:19.661Z"
     },
     {
-      "id": "evt-1792776008322-4zyu",
-      "ticketId": "ticket-1792776008318-93zzd",
+      "id": "evt-1792776919665-3fje",
+      "ticketId": "ticket-1792776919660-hffxo",
       "type": "STATUS_CHANGE",
       "fromStatus": "Submitted",
       "toStatus": "Acknowledged",
-      "actorId": "staff-1",
-      "actorName": "Triage Staff",
+      "actorId": "usr-staff-01",
+      "actorName": "Rajesh Kumar",
       "actorRole": "staff",
       "note": "Acknowledged by plumbing triage desk.",
       "isInternal": false,
-      "createdAt": "2026-10-23T17:20:08.321Z"
-    },
-    {
-      "id": "evt-1792776008325-xct8",
-      "ticketId": "ticket-1792776008318-93zzd",
-      "type": "ASSIGNMENT",
-      "fromStatus": "Acknowledged",
-      "toStatus": "Assigned",
-      "actorId": "staff-1",
-      "actorName": "Triage Staff",
-      "actorRole": "staff",
-      "note": "Assigned Vikram to inspect leak.",
-      "isInternal": false,
-      "createdAt": "2026-10-23T17:20:08.325Z"
-    },
-    {
-      "id": "evt-1792776008327-ih9m",
-      "ticketId": "ticket-1792776008318-93zzd",
-      "type": "STATUS_CHANGE",
-      "fromStatus": "Assigned",
-      "toStatus": "In progress",
-      "actorId": "staff-vikram",
-      "actorName": "Vikram Singh",
-      "actorRole": "staff",
-      "note": "Replacing washers on cold water feed valve.",
-      "isInternal": false,
-      "createdAt": "2026-10-23T17:20:08.326Z"
-    },
-    {
-      "id": "evt-1792776259278-1",
-      "ticketId": "ticket-1792776259276-ilf9v",
-      "type": "CREATED",
-      "toStatus": "Submitted",
-      "actorId": "test-student-01",
-      "actorName": "Test Student",
-      "actorRole": "student",
-      "note": "Ticket submitted via CampusConnect intelligent reporting. Priority: EXPEDITED_EMERGENCY. Urgency: HIGH.",
-      "isInternal": false,
-      "createdAt": "2026-10-23T17:24:19.277Z"
-    },
-    {
-      "id": "evt-1792776259280-nfmt",
-      "ticketId": "ticket-1792776259276-ilf9v",
-      "type": "STATUS_CHANGE",
-      "fromStatus": "Submitted",
-      "toStatus": "Acknowledged",
-      "actorId": "staff-1",
-      "actorName": "Triage Staff",
-      "actorRole": "staff",
-      "note": "Acknowledged by plumbing triage desk.",
-      "isInternal": false,
-      "createdAt": "2026-10-23T17:24:19.279Z"
-    },
-    {
-      "id": "evt-1792776259284-r98e",
-      "ticketId": "ticket-1792776259276-ilf9v",
-      "type": "ASSIGNMENT",
-      "fromStatus": "Acknowledged",
-      "toStatus": "Assigned",
-      "actorId": "staff-1",
-      "actorName": "Triage Staff",
-      "actorRole": "staff",
-      "note": "Assigned Vikram to inspect leak.",
-      "isInternal": false,
-      "createdAt": "2026-10-23T17:24:19.284Z"
-    },
-    {
-      "id": "evt-1792776259287-827w",
-      "ticketId": "ticket-1792776259276-ilf9v",
-      "type": "STATUS_CHANGE",
-      "fromStatus": "Assigned",
-      "toStatus": "In progress",
-      "actorId": "staff-vikram",
-      "actorName": "Vikram Singh",
-      "actorRole": "staff",
-      "note": "Replacing washers on cold water feed valve.",
-      "isInternal": false,
-      "createdAt": "2026-10-23T17:24:19.286Z"
+      "createdAt": "2026-10-23T17:35:19.664Z"
     }
   ]
 }

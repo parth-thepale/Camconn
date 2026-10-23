@@ -4,14 +4,18 @@ import { storage } from '../services/storage.js';
 import { ticketService } from '../services/ticketService.js';
 import { duplicateService } from '../services/duplicateService.js';
 import { Category, TicketStatus } from '../types.js';
+import { requireAuth, AuthenticatedRequest } from '../services/auth.js';
 
 export const staffRouter = Router();
+
+// Strict server-side security: ONLY staff and admin accounts can access the staff desk
+staffRouter.use(requireAuth(['staff', 'admin']));
 
 /**
  * GET /api/staff/tickets
  * Staff triage queue with filters, search, and operational counters
  */
-staffRouter.get('/tickets', (req, res) => {
+staffRouter.get('/tickets', (req: AuthenticatedRequest, res) => {
   const { status, category, search } = req.query;
 
   let list = storage.getTickets();
@@ -60,12 +64,10 @@ staffRouter.get('/tickets', (req, res) => {
  */
 const AssignmentSchema = z.object({
   assignedTo: z.string().min(2),
-  actorId: z.string().default('staff-user'),
-  actorName: z.string().default('Facilities Staff'),
   note: z.string().optional(),
 });
 
-staffRouter.patch('/tickets/:id/assignment', (req, res) => {
+staffRouter.patch('/tickets/:id/assignment', (req: AuthenticatedRequest, res) => {
   const parsed = AssignmentSchema.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: 'Invalid assignment payload', details: parsed.error.issues });
@@ -76,9 +78,9 @@ staffRouter.patch('/tickets/:id/assignment', (req, res) => {
     const result = ticketService.assignTicket({
       ticketId: req.params.id,
       assignedTo: parsed.data.assignedTo,
-      actorId: parsed.data.actorId,
-      actorName: parsed.data.actorName,
-      actorRole: 'staff',
+      actorId: req.user?.id || 'staff-admin',
+      actorName: req.user?.name || 'Facilities Operations',
+      actorRole: req.user?.role || 'staff',
       note: parsed.data.note,
     });
 
@@ -106,11 +108,9 @@ const StatusTransitionSchema = z.object({
     'Resolved',
   ]),
   note: z.string().min(3, 'A status transition requires an explanation note'),
-  actorId: z.string().default('staff-user'),
-  actorName: z.string().default('Facilities Staff'),
 });
 
-staffRouter.post('/tickets/:id/status', (req, res) => {
+staffRouter.post('/tickets/:id/status', (req: AuthenticatedRequest, res) => {
   const parsed = StatusTransitionSchema.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({
@@ -125,9 +125,9 @@ staffRouter.post('/tickets/:id/status', (req, res) => {
       ticketId: req.params.id,
       toStatus: parsed.data.toStatus as TicketStatus,
       note: parsed.data.note,
-      actorId: parsed.data.actorId,
-      actorName: parsed.data.actorName,
-      actorRole: 'staff',
+      actorId: req.user?.id || 'staff-admin',
+      actorName: req.user?.name || 'Facilities Operations',
+      actorRole: req.user?.role || 'staff',
     });
 
     res.json({
@@ -144,9 +144,9 @@ staffRouter.post('/tickets/:id/status', (req, res) => {
  * GET /api/staff/tickets/:id/duplicates
  * Get bounded candidate duplicates for human staff review
  */
-staffRouter.get('/tickets/:id/duplicates', (req, res) => {
+staffRouter.get('/tickets/:id/duplicates', (_req: AuthenticatedRequest, res) => {
   try {
-    const candidates = duplicateService.findCandidates(req.params.id);
+    const candidates = duplicateService.findCandidates(_req.params.id);
     res.json({
       success: true,
       candidates,
@@ -165,11 +165,9 @@ const DuplicateReviewSchema = z.object({
   candidateTicketId: z.string(),
   decision: z.enum(['same_issue', 'separate_issue', 'deferred']),
   reason: z.string().min(3),
-  reviewerId: z.string().default('staff-user'),
-  reviewerName: z.string().default('Triage Officer'),
 });
 
-staffRouter.post('/duplicate-reviews', (req, res) => {
+staffRouter.post('/duplicate-reviews', (req: AuthenticatedRequest, res) => {
   const parsed = DuplicateReviewSchema.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: 'Invalid review payload', details: parsed.error.issues });
@@ -177,7 +175,14 @@ staffRouter.post('/duplicate-reviews', (req, res) => {
   }
 
   try {
-    const review = duplicateService.recordReview(parsed.data);
+    const review = duplicateService.recordReview({
+      ticketId: parsed.data.ticketId,
+      candidateTicketId: parsed.data.candidateTicketId,
+      decision: parsed.data.decision,
+      reason: parsed.data.reason,
+      reviewerId: req.user?.id || 'staff-admin',
+      reviewerName: req.user?.name || 'Facilities Operations',
+    });
     res.json({
       success: true,
       review,

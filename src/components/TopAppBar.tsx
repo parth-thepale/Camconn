@@ -1,38 +1,29 @@
 import React from 'react';
 import {
   Sparkles,
-  ShieldCheck,
-  RotateCcw,
   BookOpen,
   User as UserIcon,
-  Wrench,
   Building2,
-  LogIn,
   LogOut,
+  Shield,
 } from 'lucide-react';
-import { User, UserRole } from '../types.js';
+import { User } from '../types.js';
 
 interface TopAppBarProps {
-  currentRole: UserRole;
-  currentUser: User | null;
-  onRoleChange: (role: UserRole) => void;
+  currentUser: User;
   aiConfigured: boolean;
   onOpenRoutingGuide: () => void;
-  onResetDemo: () => void;
-  onOpenAuth: () => void;
   onLogout: () => void;
 }
 
 export const TopAppBar: React.FC<TopAppBarProps> = ({
-  currentRole,
   currentUser,
-  onRoleChange,
   aiConfigured,
   onOpenRoutingGuide,
-  onResetDemo,
-  onOpenAuth,
   onLogout,
 }) => {
+  const isStaff = currentUser.role === 'staff' || currentUser.role === 'admin';
+
   return (
     <header
       style={{
@@ -63,15 +54,15 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
               width: '42px',
               height: '42px',
               borderRadius: 'var(--md-sys-shape-corner-m)',
-              backgroundColor: 'var(--md-sys-color-primary)',
-              color: 'var(--md-sys-color-on-primary)',
+              backgroundColor: isStaff ? 'var(--cat-electricity-color)' : 'var(--md-sys-color-primary)',
+              color: '#FFFFFF',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               boxShadow: 'var(--md-sys-elevation-2)',
             }}
           >
-            <Building2 size={24} />
+            {isStaff ? <Shield size={22} /> : <Building2 size={24} />}
           </div>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -87,19 +78,26 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
               </h1>
               <span
                 style={{
-                  fontSize: '0.75rem',
-                  padding: '2px 8px',
+                  fontSize: '0.6875rem',
+                  padding: '3px 8px',
                   borderRadius: 'var(--md-sys-shape-corner-full)',
-                  backgroundColor: 'var(--md-sys-color-primary-container)',
-                  color: 'var(--md-sys-color-on-primary-container)',
-                  fontWeight: 600,
+                  backgroundColor: isStaff
+                    ? 'var(--cat-electricity-container)'
+                    : 'var(--md-sys-color-primary-container)',
+                  color: isStaff
+                    ? 'var(--cat-electricity-on-container)'
+                    : 'var(--md-sys-color-on-primary-container)',
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
                 }}
               >
-                M3 FullStack
+                {isStaff ? 'Staff Operations Desk' : 'Student Portal'}
               </span>
             </div>
             <p style={{ fontSize: '0.8125rem', color: 'var(--md-sys-color-outline)' }}>
-              Intelligent Facilities Care & Real-Time Lifecycle
+              {isStaff
+                ? 'Campus Facilities Maintenance & Triage Management'
+                : 'Student Facilities Care & Live Complaint Tracking'}
             </p>
           </div>
         </div>
@@ -116,17 +114,17 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
               borderRadius: 'var(--md-sys-shape-corner-full)',
               backgroundColor: aiConfigured
                 ? 'var(--cat-cleanliness-container)'
-                : 'var(--cat-electricity-container)',
+                : 'var(--md-sys-color-surface-container)',
               color: aiConfigured
                 ? 'var(--cat-cleanliness-on-container)'
-                : 'var(--cat-electricity-on-container)',
+                : 'var(--md-sys-color-outline)',
               fontSize: '0.75rem',
               fontWeight: 600,
             }}
             title={
               aiConfigured
-                ? 'Gemini 3.8 Flash configured via Google AI Studio'
-                : 'Using local deterministic triage fallback'
+                ? 'Gemini 3.8 Flash active via Google AI Studio'
+                : 'Standard rule engine active'
             }
           >
             <Sparkles size={14} />
@@ -140,89 +138,38 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
             style={{ fontSize: '0.8125rem' }}
           >
             <BookOpen size={16} />
-            <span>Routing</span>
+            <span>SLA Directory</span>
           </button>
 
-          {/* Reset Demo */}
-          <button
-            className="md3-button-text"
-            onClick={onResetDemo}
-            title="Reset to default seed tickets"
-            style={{ fontSize: '0.8125rem' }}
+          {/* User Profile & Sign Out */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '6px 12px',
+              borderRadius: 'var(--md-sys-shape-corner-full)',
+              backgroundColor: 'var(--md-sys-color-surface-container)',
+              fontSize: '0.8125rem',
+            }}
           >
-            <RotateCcw size={15} />
-            <span>Reset Demo</span>
-          </button>
-
-          {/* User Auth Info / Login Button */}
-          {currentUser ? (
-            <div
+            <UserIcon size={14} color="var(--md-sys-color-primary)" />
+            <span style={{ fontWeight: 600 }}>{currentUser.name}</span>
+            <button
+              onClick={onLogout}
+              title="Sign Out"
+              className="md3-button-text"
               style={{
-                display: 'flex',
+                padding: '4px 8px',
+                fontSize: '0.75rem',
+                display: 'inline-flex',
                 alignItems: 'center',
-                gap: '8px',
-                padding: '4px 10px',
-                borderRadius: 'var(--md-sys-shape-corner-full)',
-                backgroundColor: 'var(--md-sys-color-surface-container)',
-                fontSize: '0.8125rem',
+                gap: '4px',
+                color: 'var(--md-sys-color-error)',
               }}
             >
-              <UserIcon size={14} color="var(--md-sys-color-primary)" />
-              <span style={{ fontWeight: 600 }}>{currentUser.name}</span>
-              <span
-                style={{
-                  fontSize: '0.6875rem',
-                  padding: '2px 6px',
-                  borderRadius: '4px',
-                  backgroundColor: 'var(--md-sys-color-primary-container)',
-                  color: 'var(--md-sys-color-on-primary-container)',
-                  fontWeight: 700,
-                  textTransform: 'uppercase',
-                }}
-              >
-                {currentUser.role}
-              </span>
-              <button
-                onClick={onLogout}
-                title="Sign Out"
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  color: 'var(--md-sys-color-outline)',
-                  display: 'flex',
-                  alignItems: 'center',
-                }}
-              >
-                <LogOut size={14} />
-              </button>
-            </div>
-          ) : (
-            <button
-              className="md3-button-filled"
-              style={{ fontSize: '0.8125rem', padding: '6px 14px' }}
-              onClick={onOpenAuth}
-            >
-              <LogIn size={15} />
-              <span>Sign In / Demo</span>
-            </button>
-          )}
-
-          {/* Role Switcher */}
-          <div className="md3-segmented-button-group">
-            <button
-              className={`md3-segment ${currentRole === 'student' ? 'active' : ''}`}
-              onClick={() => onRoleChange('student')}
-            >
-              <UserIcon size={15} />
-              <span>Student</span>
-            </button>
-            <button
-              className={`md3-segment ${currentRole === 'staff' ? 'active' : ''}`}
-              onClick={() => onRoleChange('staff')}
-            >
-              <Wrench size={15} />
-              <span>Staff Queue</span>
+              <LogOut size={13} />
+              <span>Sign Out</span>
             </button>
           </div>
         </div>
