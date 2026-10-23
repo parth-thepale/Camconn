@@ -1,6 +1,11 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import { analyzeComplaintWithGemini } from '../services/gemini.js';
+import {
+  analyzeComplaintWithGemini,
+  generateTechnicianDiagnosis,
+  analyzeCampusClusters,
+} from '../services/gemini.js';
+import { storage } from '../services/storage.js';
 
 export const aiRouter = Router();
 
@@ -27,7 +32,7 @@ const DraftRequestSchema = z.object({
 
 /**
  * POST /api/ai/draft
- * Extract structured issue fields and clarification proposal
+ * Extract structured issue fields, language detection, urgency, and clarification proposal
  */
 aiRouter.post('/draft', async (req, res) => {
   const parsed = DraftRequestSchema.safeParse(req.body);
@@ -58,5 +63,58 @@ aiRouter.post('/draft', async (req, res) => {
       error: 'Failed to generate AI draft proposal',
       message: error?.message || 'Internal error',
     });
+  }
+});
+
+/**
+ * POST /api/ai/diagnose
+ * INNOVATIVE FEATURE: AI Technician Root Cause Diagnosis & Step-by-Step Field Blueprint
+ */
+aiRouter.post('/diagnose', async (req, res) => {
+  const { ticketId } = req.body;
+  if (!ticketId) {
+    res.status(400).json({ error: 'ticketId is required' });
+    return;
+  }
+
+  const ticket = storage.getTicketById(ticketId);
+  if (!ticket) {
+    res.status(404).json({ error: 'Ticket not found' });
+    return;
+  }
+
+  try {
+    const diagnosis = await generateTechnicianDiagnosis({
+      title: ticket.title,
+      summary: ticket.summary,
+      originalText: ticket.originalText,
+      category: ticket.category,
+      location: ticket.location,
+    });
+
+    res.json({
+      success: true,
+      ticketId: ticket.id,
+      diagnosis,
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: 'Failed to generate diagnosis', message: err?.message });
+  }
+});
+
+/**
+ * GET /api/ai/patterns
+ * INNOVATIVE FEATURE: Campus Infrastructure Recurring Cluster Detection
+ */
+aiRouter.get('/patterns', async (_req, res) => {
+  try {
+    const tickets = storage.getTickets();
+    const clusters = await analyzeCampusClusters(tickets);
+    res.json({
+      success: true,
+      clusters,
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: 'Failed to analyze patterns', message: err?.message });
   }
 });

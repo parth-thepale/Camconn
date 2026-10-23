@@ -14,6 +14,11 @@ import {
   MessageSquare,
   Shield,
   Loader2,
+  Sparkles,
+  Network,
+  Zap,
+  CreditCard,
+  BadgeCheck,
 } from 'lucide-react';
 import {
   Ticket,
@@ -30,6 +35,8 @@ import {
   assignTicket,
 } from '../api.js';
 import { DuplicateReviewModal } from './DuplicateReviewModal.js';
+import { TechnicianDiagnosisModal } from './TechnicianDiagnosisModal.js';
+import { CampusClustersModal } from './CampusClustersModal.js';
 
 export const StaffDashboard: React.FC = () => {
   const [tickets, setTickets] = useState<Ticket[]>([]);
@@ -60,8 +67,10 @@ export const StaffDashboard: React.FC = () => {
   const [assigneeInput, setAssigneeInput] = useState('');
   const [isAssigning, setIsAssigning] = useState(false);
 
-  // Duplicate Review modal state
+  // Modals state
   const [reviewingDuplicateTicket, setReviewingDuplicateTicket] = useState<Ticket | null>(null);
+  const [diagnosingTicket, setDiagnosingTicket] = useState<Ticket | null>(null);
+  const [isClustersModalOpen, setIsClustersModalOpen] = useState(false);
   const [actionMessage, setActionMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
   const loadQueue = async () => {
@@ -131,7 +140,6 @@ export const StaffDashboard: React.FC = () => {
       setNextStatus('');
       setActionMessage({ text: `Status updated to ${res.ticket.status}`, type: 'success' });
       await loadQueue();
-      // Reload events
       const details = await fetchTicketDetails(selectedTicket.id);
       setTicketEvents(details.events);
     } catch (err: any) {
@@ -156,7 +164,6 @@ export const StaffDashboard: React.FC = () => {
       setSelectedTicket(res.ticket);
       setActionMessage({ text: `Assigned to ${assigneeInput.trim()}`, type: 'success' });
       await loadQueue();
-      // Reload events
       const details = await fetchTicketDetails(selectedTicket.id);
       setTicketEvents(details.events);
     } catch (err: any) {
@@ -166,7 +173,6 @@ export const StaffDashboard: React.FC = () => {
     }
   };
 
-  // Helper for status badge
   const getStatusBadge = (status: TicketStatus) => {
     const s = status.toLowerCase().replace(' ', '-');
     return <span className={`status-badge status-${s}`}>{status}</span>;
@@ -228,7 +234,7 @@ export const StaffDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Filter and Search Bar */}
+      {/* Filter, Search & AI Tools Bar */}
       <div
         className="md3-card-filled"
         style={{
@@ -245,8 +251,8 @@ export const StaffDashboard: React.FC = () => {
           <input
             type="text"
             className="md3-input"
-            style={{ minWidth: '240px', flex: 1 }}
-            placeholder="Search tickets, titles, buildings..."
+            style={{ minWidth: '220px', flex: 1 }}
+            placeholder="Search tickets, buildings, references..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -278,10 +284,22 @@ export const StaffDashboard: React.FC = () => {
           </select>
         </div>
 
-        <button className="md3-button-text" onClick={loadQueue}>
-          <RefreshCw size={16} />
-          <span>Refresh</span>
-        </button>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          {/* AI Cluster Insights Tool */}
+          <button
+            className="md3-button-tonal"
+            style={{ fontSize: '0.8125rem' }}
+            onClick={() => setIsClustersModalOpen(true)}
+          >
+            <Network size={15} />
+            <span>AI Cluster Insights</span>
+          </button>
+
+          <button className="md3-button-text" onClick={loadQueue}>
+            <RefreshCw size={15} />
+            <span>Refresh</span>
+          </button>
+        </div>
       </div>
 
       {/* Main Content Grid: Table List & Detail Drawer */}
@@ -302,7 +320,7 @@ export const StaffDashboard: React.FC = () => {
                   backgroundColor: 'var(--md-sys-color-surface-container-high)',
                 }}
               >
-                <th style={{ padding: '12px 16px', fontSize: '0.75rem', fontWeight: 600 }}>REFERENCE</th>
+                <th style={{ padding: '12px 16px', fontSize: '0.75rem', fontWeight: 600 }}>REF & TIER</th>
                 <th style={{ padding: '12px 16px', fontSize: '0.75rem', fontWeight: 600 }}>TITLE & LOCATION</th>
                 <th style={{ padding: '12px 16px', fontSize: '0.75rem', fontWeight: 600 }}>CATEGORY</th>
                 <th style={{ padding: '12px 16px', fontSize: '0.75rem', fontWeight: 600 }}>STATUS</th>
@@ -338,8 +356,24 @@ export const StaffDashboard: React.FC = () => {
                       transition: 'background-color 0.15s ease',
                     }}
                   >
-                    <td style={{ padding: '12px 16px', fontFamily: 'monospace', fontWeight: 700, fontSize: '0.8125rem' }}>
-                      {t.reference}
+                    <td style={{ padding: '12px 16px' }}>
+                      <div style={{ fontFamily: 'monospace', fontWeight: 700, fontSize: '0.8125rem' }}>
+                        {t.reference}
+                      </div>
+                      {t.priorityTier === 'expedited_emergency' && (
+                        <span
+                          style={{
+                            fontSize: '0.6875rem',
+                            color: '#B45309',
+                            fontWeight: 700,
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '2px',
+                          }}
+                        >
+                          <Zap size={10} /> EMERGENCY (PAID)
+                        </span>
+                      )}
                     </td>
                     <td style={{ padding: '12px 16px' }}>
                       <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>{t.title}</div>
@@ -467,20 +501,34 @@ export const StaffDashboard: React.FC = () => {
               <div style={{ marginBottom: '4px' }}>
                 <strong>Original Complaint:</strong> "{selectedTicket.originalText}"
               </div>
+              {selectedTicket.translatedText && (
+                <div style={{ color: 'var(--md-sys-color-primary)', marginBottom: '4px' }}>
+                  <strong>Auto-Translated:</strong> "{selectedTicket.translatedText}"
+                </div>
+              )}
               <div style={{ color: 'var(--md-sys-color-outline)' }}>
                 <strong>Routing Provenance:</strong> {selectedTicket.routingReason}
               </div>
             </div>
 
-            {/* Duplicate Candidate Check Button */}
-            <div style={{ marginBottom: '20px' }}>
+            {/* AI Field Diagnostics Button */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '16px' }}>
+              <button
+                className="md3-button-filled"
+                style={{ fontSize: '0.8125rem', padding: '8px 12px' }}
+                onClick={() => setDiagnosingTicket(selectedTicket)}
+              >
+                <Sparkles size={14} />
+                <span>AI Repair Blueprint</span>
+              </button>
+
               <button
                 className="md3-button-tonal"
-                style={{ width: '100%', fontSize: '0.8125rem' }}
+                style={{ fontSize: '0.8125rem', padding: '8px 12px' }}
                 onClick={() => setReviewingDuplicateTicket(selectedTicket)}
               >
-                <AlertTriangle size={15} />
-                <span>Review Potential Duplicates</span>
+                <AlertTriangle size={14} />
+                <span>Review Duplicates</span>
               </button>
             </div>
 
@@ -598,13 +646,24 @@ export const StaffDashboard: React.FC = () => {
         )}
       </div>
 
-      {/* Duplicate Review Modal */}
+      {/* Modals */}
       {reviewingDuplicateTicket && (
         <DuplicateReviewModal
           ticket={reviewingDuplicateTicket}
           onClose={() => setReviewingDuplicateTicket(null)}
           onReviewCompleted={loadQueue}
         />
+      )}
+
+      {diagnosingTicket && (
+        <TechnicianDiagnosisModal
+          ticket={diagnosingTicket}
+          onClose={() => setDiagnosingTicket(null)}
+        />
+      )}
+
+      {isClustersModalOpen && (
+        <CampusClustersModal onClose={() => setIsClustersModalOpen(false)} />
       )}
     </div>
   );

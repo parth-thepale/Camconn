@@ -5,16 +5,25 @@ import { ReportIssue } from './components/ReportIssue.js';
 import { StudentTracker } from './components/StudentTracker.js';
 import { StaffDashboard } from './components/StaffDashboard.js';
 import { RoutingGuideModal } from './components/RoutingGuideModal.js';
-import { fetchHealth, fetchCampusLocations, resetDemoDataset } from './api.js';
-import { PlusCircle, Search, Wrench, Sparkles, CheckCircle2 } from 'lucide-react';
-import { Ticket } from './types.js';
+import { AuthModal } from './components/AuthModal.js';
+import {
+  fetchHealth,
+  fetchCampusLocations,
+  resetDemoDataset,
+  fetchCurrentUser,
+  clearStoredToken,
+} from './api.js';
+import { PlusCircle, Search, CheckCircle2 } from 'lucide-react';
+import { Ticket, User, UserRole } from './types.js';
 
 export const App: React.FC = () => {
-  const [currentRole, setCurrentRole] = useState<'student' | 'staff' | 'admin'>('student');
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [currentRole, setCurrentRole] = useState<UserRole>('student');
   const [studentTab, setStudentTab] = useState<'report' | 'track'>('report');
   const [aiConfigured, setAiConfigured] = useState(false);
   const [campusLocations, setCampusLocations] = useState<string[]>([]);
   const [isRoutingGuideOpen, setIsRoutingGuideOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [trackingTicketId, setTrackingTicketId] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -26,6 +35,12 @@ export const App: React.FC = () => {
 
         const locs = await fetchCampusLocations();
         setCampusLocations(locs);
+
+        const user = await fetchCurrentUser();
+        if (user) {
+          setCurrentUser(user);
+          setCurrentRole(user.role);
+        }
       } catch (err) {
         console.error('Initialization error:', err);
       }
@@ -48,6 +63,19 @@ export const App: React.FC = () => {
     }
   };
 
+  const handleLogout = () => {
+    clearStoredToken();
+    setCurrentUser(null);
+    setCurrentRole('student');
+    showToast('Signed out of campus account.');
+  };
+
+  const handleAuthSuccess = (user: User) => {
+    setCurrentUser(user);
+    setCurrentRole(user.role);
+    showToast(`Welcome back, ${user.name} (${user.role.toUpperCase()})`);
+  };
+
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => {
@@ -60,10 +88,13 @@ export const App: React.FC = () => {
       {/* Top App Bar */}
       <TopAppBar
         currentRole={currentRole}
+        currentUser={currentUser}
         onRoleChange={(role) => setCurrentRole(role)}
         aiConfigured={aiConfigured}
         onOpenRoutingGuide={() => setIsRoutingGuideOpen(true)}
         onResetDemo={handleResetDemo}
+        onOpenAuth={() => setIsAuthModalOpen(true)}
+        onLogout={handleLogout}
       />
 
       {/* Floating Toast Notification */}
@@ -134,7 +165,9 @@ export const App: React.FC = () => {
           studentTab === 'report' ? (
             <ReportIssue
               campusLocations={campusLocations}
+              currentUser={currentUser}
               onTicketCreated={handleTicketCreated}
+              onRequestAuth={() => setIsAuthModalOpen(true)}
             />
           ) : (
             <StudentTracker initialTicketId={trackingTicketId} />
@@ -156,13 +189,20 @@ export const App: React.FC = () => {
         }}
       >
         <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
-          CampusConnect • Powered by Google AI Studio & Gemini 3.8 Flash • Material 3 Design
+          CampusConnect • Powered by Google AI Studio & Gemini 3.8 Flash • Material 3 Full-Stack
         </div>
       </footer>
 
       {/* Modals */}
       {isRoutingGuideOpen && (
         <RoutingGuideModal onClose={() => setIsRoutingGuideOpen(false)} />
+      )}
+
+      {isAuthModalOpen && (
+        <AuthModal
+          onClose={() => setIsAuthModalOpen(false)}
+          onAuthSuccess={handleAuthSuccess}
+        />
       )}
     </div>
   );

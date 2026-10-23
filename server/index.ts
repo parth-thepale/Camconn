@@ -3,6 +3,8 @@ import cors from 'cors';
 import path from 'path';
 import fs from 'fs';
 import { PORT, NODE_ENV, GEMINI_API_KEY } from './config.js';
+import { authRouter } from './routes/auth.js';
+import { checkoutRouter } from './routes/checkout.js';
 import { aiRouter } from './routes/ai.js';
 import { ticketRouter } from './routes/tickets.js';
 import { staffRouter } from './routes/staff.js';
@@ -28,6 +30,8 @@ app.use((req, res, next) => {
 });
 
 // Mount API routes
+app.use('/api/auth', authRouter);
+app.use('/api/checkout', checkoutRouter);
 app.use('/api/ai', aiRouter);
 app.use('/api/tickets', ticketRouter);
 app.use('/api/staff', staffRouter);

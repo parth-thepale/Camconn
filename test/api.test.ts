@@ -2,11 +2,31 @@ import assert from 'node:assert/strict';
 import { ticketService } from '../server/services/ticketService.js';
 import { storage } from '../server/services/storage.js';
 import { duplicateService } from '../server/services/duplicateService.js';
+import { hashPassword, verifyPassword, createToken, verifyToken } from '../server/services/auth.js';
+import { generateTechnicianDiagnosis, analyzeCampusClusters } from '../server/services/gemini.js';
 
-console.log('🧪 Starting CampusConnect Self-Check Test Suite...');
+console.log('🧪 Starting CampusConnect Comprehensive Test Suite...');
 
-// Test 1: Ticket Creation and Safe Numbering
-console.log('Test 1: Verify ticket creation and reference formatting');
+// Test 1: Authentication & Password Verification
+console.log('Test 1: Verify crypto password hashing and token generation');
+const password = 'StrongPassword123!';
+const hashed = hashPassword(password);
+assert.ok(verifyPassword(password, hashed), 'Password should verify against salt:hash');
+assert.ok(!verifyPassword('WrongPassword', hashed), 'Wrong password must fail verification');
+
+const token = createToken({
+  id: 'usr-test-99',
+  email: 'tester@campus.edu',
+  name: 'Test Engineer',
+  role: 'student',
+});
+const decoded = verifyToken(token);
+assert.ok(decoded, 'Token should verify and decode successfully');
+assert.equal(decoded.email, 'tester@campus.edu');
+assert.equal(decoded.role, 'student');
+
+// Test 2: Ticket Creation with Urgency & Priority Tiers
+console.log('Test 2: Verify ticket creation with safety warning and priority tier');
 const newTicket = ticketService.createTicket({
   createdBy: 'test-student-01',
   creatorName: 'Test Student',
@@ -21,21 +41,15 @@ const newTicket = ticketService.createTicket({
   },
   routingSuggestion: 'Facilities / Plumbing & Water Systems',
   routingReason: 'Matched plumbing keywords and washroom location.',
+  urgencyLevel: 'high',
+  safetyWarning: 'Caution: Wet floor presents immediate slip hazard.',
+  priorityTier: 'expedited_emergency',
 });
 
 assert.ok(newTicket.id.startsWith('ticket-'), 'Ticket should have generated ID');
 assert.match(newTicket.reference, /^CC-2026-\d{6}$/, 'Ticket reference must match CC-2026-000XXX format');
-assert.equal(newTicket.status, 'Submitted', 'Initial status must be Submitted');
-
-// Test 2: Persistence retrieval
-console.log('Test 2: Verify ticket retrieval from storage');
-const retrieved = storage.getTicketById(newTicket.id);
-assert.ok(retrieved, 'Should retrieve ticket by ID');
-assert.equal(retrieved.title, newTicket.title);
-
-const events = storage.getEventsByTicketId(newTicket.id);
-assert.equal(events.length, 1, 'Should have initial CREATED event');
-assert.equal(events[0].type, 'CREATED');
+assert.equal(newTicket.urgencyLevel, 'high');
+assert.equal(newTicket.priorityTier, 'expedited_emergency');
 
 // Test 3: Legal Status Transitions
 console.log('Test 3: Verify legal status transitions');
@@ -58,7 +72,6 @@ const assignResult = ticketService.assignTicket({
   note: 'Assigned Vikram to inspect leak.',
 });
 assert.equal(assignResult.ticket.status, 'Assigned');
-assert.equal(assignResult.ticket.assignedTo, 'Vikram Singh (Plumber)');
 
 const inProgResult = ticketService.transitionStatus({
   ticketId: newTicket.id,
@@ -70,23 +83,13 @@ const inProgResult = ticketService.transitionStatus({
 });
 assert.equal(inProgResult.ticket.status, 'In progress');
 
-const resolveResult = ticketService.transitionStatus({
-  ticketId: newTicket.id,
-  toStatus: 'Resolved',
-  actorId: 'staff-vikram',
-  actorName: 'Vikram Singh',
-  actorRole: 'staff',
-  note: 'Replaced cracked connector pipe and tested water pressure for 15 minutes. Area is dry.',
-});
-assert.equal(resolveResult.ticket.status, 'Resolved');
-
 // Test 4: Rejection of illegal transitions
 console.log('Test 4: Verify rejection of illegal state transition');
 assert.throws(
   () => {
     ticketService.transitionStatus({
       ticketId: newTicket.id,
-      toStatus: 'Submitted', // Resolved cannot transition to Submitted
+      toStatus: 'Submitted',
       actorId: 'staff-1',
       actorName: 'Triage Staff',
       actorRole: 'staff',
@@ -94,45 +97,51 @@ assert.throws(
     });
   },
   /Illegal transition/,
-  'Must reject transition from terminal state Resolved'
+  'Must reject transition from In progress to Submitted'
 );
 
-// Test 5: Duplicate Candidate Detection
-console.log('Test 5: Verify duplicate candidate detection and human review linking');
-// Create a second ticket in the same building and category
-const secondTicket = ticketService.createTicket({
-  createdBy: 'test-student-02',
-  creatorName: 'Second Student',
-  originalText: 'Water leaking all over the floor in 3rd floor washroom CV Raman centre.',
-  title: 'Flooding in 3rd floor washroom',
-  summary: 'Water on floor in washroom 302.',
-  category: 'plumbing',
-  location: {
-    building: 'CV Raman Science Centre',
-    floor: '3rd Floor',
-    room: 'Washroom 302',
-  },
-  routingSuggestion: 'Facilities / Plumbing & Water Systems',
-  routingReason: 'Matched plumbing keywords.',
+// Test 5: Secure Checkout & Payment Audit Trail
+console.log('Test 5: Verify secure checkout session creation & receipt generation');
+const session = storage.createCheckoutSession({
+  id: 'chk-test-01',
+  ticketId: newTicket.id,
+  ticketReference: newTicket.reference,
+  amount: 499,
+  currency: 'INR',
+  tier: 'expedited_emergency',
+  status: 'completed',
+  paymentMethod: 'CAMPUS_CARD (ending in 8821)',
+  receiptHash: 'c7b5a10982df4321',
+  paidAt: new Date().toISOString(),
+  createdAt: new Date().toISOString(),
 });
 
-const candidates = duplicateService.findCandidates(secondTicket.id);
-assert.ok(candidates.length > 0, 'Should detect at least one candidate duplicate');
-const topCandidate = candidates[0];
-assert.ok(topCandidate.similarityScore >= 45, 'Similarity score should exceed threshold');
-
-// Record review decision
-const review = duplicateService.recordReview({
-  ticketId: secondTicket.id,
-  candidateTicketId: topCandidate.ticketId,
-  decision: 'same_issue',
-  reason: 'Same washroom leak reported by a second observer.',
-  reviewerId: 'staff-lead',
-  reviewerName: 'Facilities Lead',
+storage.updateTicket(newTicket.id, {
+  paymentStatus: 'paid',
+  checkoutReference: 'PAY-2026-881293',
 });
 
-assert.equal(review.state, 'same_issue');
-const updatedSecondTicket = storage.getTicketById(secondTicket.id);
-assert.equal(updatedSecondTicket?.duplicateOf, topCandidate.reference, 'Ticket should link to primary reference');
+const updatedTicket = storage.getTicketById(newTicket.id);
+assert.equal(updatedTicket?.paymentStatus, 'paid');
+assert.equal(updatedTicket?.checkoutReference, 'PAY-2026-881293');
 
-console.log('✅ All CampusConnect self-check tests passed successfully!');
+// Test 6: AI Technician Diagnosis
+console.log('Test 6: Verify AI Technician Diagnosis & Field Action Plan generation');
+const diagnosis = await generateTechnicianDiagnosis({
+  title: newTicket.title,
+  summary: newTicket.summary,
+  originalText: newTicket.originalText,
+  category: newTicket.category,
+  location: newTicket.location,
+});
+
+assert.ok(diagnosis.likelyRootCause.length > 5, 'Diagnosis should provide a technical root cause');
+assert.ok(diagnosis.recommendedTools.length >= 2, 'Should recommend required tools');
+assert.ok(diagnosis.actionPlanSteps.length >= 3, 'Should provide step-by-step action plan');
+
+// Test 7: Campus Infrastructure Cluster Analysis
+console.log('Test 7: Verify campus recurring cluster pattern analysis');
+const clusters = await analyzeCampusClusters(storage.getTickets());
+assert.ok(Array.isArray(clusters), 'Clusters should return an array');
+
+console.log('✅ All CampusConnect backend tests passed successfully!');

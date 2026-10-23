@@ -4,25 +4,34 @@ import {
   ShieldCheck,
   RotateCcw,
   BookOpen,
-  User,
+  User as UserIcon,
   Wrench,
   Building2,
+  LogIn,
+  LogOut,
 } from 'lucide-react';
+import { User, UserRole } from '../types.js';
 
 interface TopAppBarProps {
-  currentRole: 'student' | 'staff' | 'admin';
-  onRoleChange: (role: 'student' | 'staff' | 'admin') => void;
+  currentRole: UserRole;
+  currentUser: User | null;
+  onRoleChange: (role: UserRole) => void;
   aiConfigured: boolean;
   onOpenRoutingGuide: () => void;
   onResetDemo: () => void;
+  onOpenAuth: () => void;
+  onLogout: () => void;
 }
 
 export const TopAppBar: React.FC<TopAppBarProps> = ({
   currentRole,
+  currentUser,
   onRoleChange,
   aiConfigured,
   onOpenRoutingGuide,
   onResetDemo,
+  onOpenAuth,
+  onLogout,
 }) => {
   return (
     <header
@@ -86,11 +95,11 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
                   fontWeight: 600,
                 }}
               >
-                M3 Edition
+                M3 FullStack
               </span>
             </div>
             <p style={{ fontSize: '0.8125rem', color: 'var(--md-sys-color-outline)' }}>
-              Intelligent Facilities Care & Ticket Lifecycle
+              Intelligent Facilities Care & Real-Time Lifecycle
             </p>
           </div>
         </div>
@@ -124,14 +133,14 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
             <span>{aiConfigured ? 'Gemini 3.8 Flash' : 'Rule Engine Active'}</span>
           </div>
 
-          {/* Routing Guide Button */}
+          {/* Routing Guide */}
           <button
             className="md3-button-text"
             onClick={onOpenRoutingGuide}
             style={{ fontSize: '0.8125rem' }}
           >
             <BookOpen size={16} />
-            <span>Routing Guide</span>
+            <span>Routing</span>
           </button>
 
           {/* Reset Demo */}
@@ -145,13 +154,67 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
             <span>Reset Demo</span>
           </button>
 
+          {/* User Auth Info / Login Button */}
+          {currentUser ? (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '4px 10px',
+                borderRadius: 'var(--md-sys-shape-corner-full)',
+                backgroundColor: 'var(--md-sys-color-surface-container)',
+                fontSize: '0.8125rem',
+              }}
+            >
+              <UserIcon size={14} color="var(--md-sys-color-primary)" />
+              <span style={{ fontWeight: 600 }}>{currentUser.name}</span>
+              <span
+                style={{
+                  fontSize: '0.6875rem',
+                  padding: '2px 6px',
+                  borderRadius: '4px',
+                  backgroundColor: 'var(--md-sys-color-primary-container)',
+                  color: 'var(--md-sys-color-on-primary-container)',
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                }}
+              >
+                {currentUser.role}
+              </span>
+              <button
+                onClick={onLogout}
+                title="Sign Out"
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: 'var(--md-sys-color-outline)',
+                  display: 'flex',
+                  alignItems: 'center',
+                }}
+              >
+                <LogOut size={14} />
+              </button>
+            </div>
+          ) : (
+            <button
+              className="md3-button-filled"
+              style={{ fontSize: '0.8125rem', padding: '6px 14px' }}
+              onClick={onOpenAuth}
+            >
+              <LogIn size={15} />
+              <span>Sign In / Demo</span>
+            </button>
+          )}
+
           {/* Role Switcher */}
           <div className="md3-segmented-button-group">
             <button
               className={`md3-segment ${currentRole === 'student' ? 'active' : ''}`}
               onClick={() => onRoleChange('student')}
             >
-              <User size={15} />
+              <UserIcon size={15} />
               <span>Student</span>
             </button>
             <button

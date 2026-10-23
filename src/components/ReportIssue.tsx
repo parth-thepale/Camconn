@@ -12,18 +12,28 @@ import {
   Send,
   Loader2,
   RefreshCw,
+  Globe,
+  AlertTriangle,
+  Zap,
+  ShieldCheck,
+  CreditCard,
 } from 'lucide-react';
-import { DraftAnalysis, LocationData, Ticket, Category } from '../types.js';
+import { DraftAnalysis, LocationData, Ticket, Category, User } from '../types.js';
 import { generateAiDraft, submitConfirmedTicket } from '../api.js';
+import { CheckoutModal } from './CheckoutModal.js';
 
 interface ReportIssueProps {
   campusLocations: string[];
+  currentUser: User | null;
   onTicketCreated: (ticket: Ticket) => void;
+  onRequestAuth: () => void;
 }
 
 export const ReportIssue: React.FC<ReportIssueProps> = ({
   campusLocations,
+  currentUser,
   onTicketCreated,
+  onRequestAuth,
 }) => {
   // Step state: 1 = Form Input, 2 = AI Draft & Clarification, 3 = Confirmation, 4 = Receipt
   const [currentStep, setCurrentStep] = useState<number>(1);
@@ -43,6 +53,11 @@ export const ReportIssue: React.FC<ReportIssueProps> = ({
     Array<{ question: string; answer: string }>
   >([]);
   const [currentClarificationInput, setCurrentClarificationInput] = useState('');
+
+  // Priority & Checkout state
+  const [selectedTier, setSelectedTier] = useState<'standard' | 'expedited_emergency'>('standard');
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [checkoutReceipt, setCheckoutReceipt] = useState<any | null>(null);
 
   // Submission state
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -123,7 +138,6 @@ export const ReportIssue: React.FC<ReportIssueProps> = ({
         zone: zone.trim() || undefined,
       };
 
-      // Re-run AI analysis with clarification response included
       const analysis = await generateAiDraft({
         complaintText,
         location,
@@ -163,8 +177,15 @@ export const ReportIssue: React.FC<ReportIssueProps> = ({
         routingSuggestion: draft.routingSuggestion,
         routingReason: draft.routingReason,
         clarifications: clarificationAnswers,
-        createdBy: 'student-ananya',
-        creatorName: 'Ananya Sharma (Student)',
+        urgencyLevel: draft.urgencyLevel,
+        safetyWarning: draft.safetyWarning,
+        detectedLanguage: draft.detectedLanguage,
+        translatedText: draft.translatedText,
+        priorityTier: selectedTier,
+        paymentStatus: selectedTier === 'expedited_emergency' && checkoutReceipt ? 'paid' : 'waived',
+        checkoutReference: checkoutReceipt?.transactionId || null,
+        createdBy: currentUser?.id || 'student-ananya',
+        creatorName: currentUser?.name || 'Ananya Sharma (Student)',
       });
 
       setCreatedTicket(ticket);
@@ -188,17 +209,40 @@ export const ReportIssue: React.FC<ReportIssueProps> = ({
     setClarificationAnswers([]);
     setCurrentClarificationInput('');
     setCreatedTicket(null);
+    setSelectedTier('standard');
+    setCheckoutReceipt(null);
     setCurrentStep(1);
     setErrorMessage(null);
   };
 
-  // Helper for Category Chip styling
   const getCategoryClass = (cat: Category) => {
     return `md3-chip chip-${cat}`;
   };
 
+  const getUrgencyBadge = (level: string) => {
+    if (level === 'critical') {
+      return (
+        <span style={{ backgroundColor: '#BA1A1A', color: '#FFF', padding: '3px 10px', borderRadius: '999px', fontSize: '0.75rem', fontWeight: 700 }}>
+          🚨 CRITICAL HAZARD
+        </span>
+      );
+    }
+    if (level === 'high') {
+      return (
+        <span style={{ backgroundColor: '#FFE082', color: '#5D4037', padding: '3px 10px', borderRadius: '999px', fontSize: '0.75rem', fontWeight: 700 }}>
+          ⚠️ HIGH PRIORITY
+        </span>
+      );
+    }
+    return (
+      <span style={{ backgroundColor: '#ECEEF4', color: '#43474E', padding: '3px 10px', borderRadius: '999px', fontSize: '0.75rem', fontWeight: 600 }}>
+        STANDARD ({level.toUpperCase()})
+      </span>
+    );
+  };
+
   return (
-    <div style={{ maxWidth: '780px', margin: '0 auto', padding: '24px 16px' }}>
+    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '24px 16px' }}>
       {/* Stepper Header */}
       <div
         style={{
@@ -292,8 +336,8 @@ export const ReportIssue: React.FC<ReportIssueProps> = ({
               Report a Campus Maintenance Concern
             </h2>
             <p style={{ fontSize: '0.875rem', color: 'var(--md-sys-color-outline)' }}>
-              Describe the fault naturally. Gemini AI will analyze the issue, identify the
-              department, and request any missing details.
+              Type naturally in English or Hindi/Hinglish. Gemini 3.8 Flash automatically translates,
+              assesses hazard urgency, and extracts structured fields.
             </p>
           </div>
 
@@ -305,13 +349,14 @@ export const ReportIssue: React.FC<ReportIssueProps> = ({
             <textarea
               className="md3-textarea"
               rows={4}
-              placeholder="e.g. Water is leaking from the ceiling right outside the second-floor washroom, forming a puddle..."
+              placeholder="e.g. Water is leaking from the ceiling near Lab 2... or '2nd floor washroom me paani tapak raha hai ceiling se...'"
               value={complaintText}
               onChange={(e) => setComplaintText(e.target.value)}
             />
-            <span style={{ fontSize: '0.75rem', color: 'var(--md-sys-color-outline)' }}>
-              Include any sensory details, sounds, smells, or physical hazards.
-            </span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--md-sys-color-outline)' }}>
+              <span>Includes auto-translation & safety hazard analysis</span>
+              <span>English & Hindi supported</span>
+            </div>
           </div>
 
           {/* Quick Prompts */}
@@ -338,13 +383,13 @@ export const ReportIssue: React.FC<ReportIssueProps> = ({
                 className="md3-chip"
                 style={{ cursor: 'pointer', background: 'var(--cat-electricity-container)', color: 'var(--cat-electricity-on-container)' }}
                 onClick={() => {
-                  setComplaintText('Switchboard is making loud buzzing noises and two tube lights are flickering violently in LH 102.');
+                  setComplaintText('Main switchboard se sparks nikal rahe hain aur switchboard buzz kar raha hai LH 204 me.');
                   setBuilding('Aryabhata Academic Block');
-                  setFloor('1st Floor');
-                  setRoom('LH 102');
+                  setFloor('2nd Floor');
+                  setRoom('LH 204');
                 }}
               >
-                ⚡ Electrical Noise
+                ⚡ Sparks in Switchboard (Hindi)
               </button>
               <button
                 type="button"
@@ -481,7 +526,7 @@ export const ReportIssue: React.FC<ReportIssueProps> = ({
               {isAnalyzing ? (
                 <>
                   <Loader2 size={18} className="spin-icon" />
-                  <span>Analyzing with AI...</span>
+                  <span>Analyzing with Gemini AI...</span>
                 </>
               ) : (
                 <>
@@ -507,27 +552,68 @@ export const ReportIssue: React.FC<ReportIssueProps> = ({
                 marginBottom: '16px',
                 borderBottom: '1px solid var(--md-sys-color-surface-variant)',
                 paddingBottom: '12px',
+                flexWrap: 'wrap',
+                gap: '8px',
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Sparkles size={20} color="var(--md-sys-color-primary)" />
-                <h3 style={{ fontSize: '1.125rem', fontWeight: 600 }}>AI Structured Draft</h3>
+                <h3 style={{ fontSize: '1.125rem', fontWeight: 600 }}>AI Structured Extraction</h3>
               </div>
-              <span className={getCategoryClass(draft.category)}>
-                {draft.category.toUpperCase().replace('_', ' ')}
-              </span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                {getUrgencyBadge(draft.urgencyLevel)}
+                <span className={getCategoryClass(draft.category)}>
+                  {draft.category.toUpperCase().replace('_', ' ')}
+                </span>
+              </div>
             </div>
+
+            {/* Safety Hazard Warning */}
+            {draft.safetyWarning && (
+              <div
+                style={{
+                  backgroundColor: 'var(--md-sys-color-error-container)',
+                  color: 'var(--md-sys-color-on-error-container)',
+                  padding: '12px 16px',
+                  borderRadius: 'var(--md-sys-shape-corner-m)',
+                  marginBottom: '14px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  fontSize: '0.875rem',
+                  fontWeight: 600,
+                }}
+              >
+                <AlertTriangle size={20} />
+                <span>{draft.safetyWarning}</span>
+              </div>
+            )}
+
+            {/* Multilingual Translation Notice */}
+            {draft.detectedLanguage !== 'English' && draft.translatedText && (
+              <div
+                style={{
+                  backgroundColor: 'var(--cat-internet-container)',
+                  color: 'var(--cat-internet-on-container)',
+                  padding: '10px 14px',
+                  borderRadius: 'var(--md-sys-shape-corner-m)',
+                  marginBottom: '14px',
+                  fontSize: '0.8125rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                }}
+              >
+                <Globe size={16} />
+                <span>
+                  Detected <strong>{draft.detectedLanguage}</strong>. Translated to English: "{draft.translatedText}"
+                </span>
+              </div>
+            )}
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <div>
-                <span
-                  style={{
-                    fontSize: '0.75rem',
-                    color: 'var(--md-sys-color-outline)',
-                    textTransform: 'uppercase',
-                    fontWeight: 600,
-                  }}
-                >
+                <span style={{ fontSize: '0.75rem', color: 'var(--md-sys-color-outline)', textTransform: 'uppercase', fontWeight: 600 }}>
                   Proposed Title
                 </span>
                 <p style={{ fontSize: '1.0625rem', fontWeight: 600, marginTop: '2px' }}>
@@ -536,23 +622,10 @@ export const ReportIssue: React.FC<ReportIssueProps> = ({
               </div>
 
               <div>
-                <span
-                  style={{
-                    fontSize: '0.75rem',
-                    color: 'var(--md-sys-color-outline)',
-                    textTransform: 'uppercase',
-                    fontWeight: 600,
-                  }}
-                >
+                <span style={{ fontSize: '0.75rem', color: 'var(--md-sys-color-outline)', textTransform: 'uppercase', fontWeight: 600 }}>
                   Actionable Summary
                 </span>
-                <p
-                  style={{
-                    fontSize: '0.9375rem',
-                    color: 'var(--md-sys-color-on-surface-variant)',
-                    marginTop: '2px',
-                  }}
-                >
+                <p style={{ fontSize: '0.9375rem', color: 'var(--md-sys-color-on-surface-variant)', marginTop: '2px' }}>
                   {draft.summary}
                 </p>
               </div>
@@ -574,7 +647,7 @@ export const ReportIssue: React.FC<ReportIssueProps> = ({
             </div>
           </div>
 
-          {/* Clarification Dialogue Card (if information is missing) */}
+          {/* Clarification Dialogue Card */}
           {draft.clarifyingQuestion ? (
             <div
               className="md3-card-outlined"
@@ -589,13 +662,7 @@ export const ReportIssue: React.FC<ReportIssueProps> = ({
                   Missing Detail Needed
                 </h4>
               </div>
-              <p
-                style={{
-                  fontSize: '0.9375rem',
-                  color: 'var(--md-sys-color-on-surface)',
-                  marginBottom: '16px',
-                }}
-              >
+              <p style={{ fontSize: '0.9375rem', color: 'var(--md-sys-color-on-surface)', marginBottom: '16px' }}>
                 {draft.clarifyingQuestion}
               </p>
 
@@ -624,7 +691,7 @@ export const ReportIssue: React.FC<ReportIssueProps> = ({
               {clarificationAnswers.length > 0 && (
                 <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px dashed var(--md-sys-color-outline-variant)' }}>
                   <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--md-sys-color-outline)' }}>
-                    Previous Clarifications Provided:
+                    Previous Clarifications:
                   </span>
                   {clarificationAnswers.map((a, i) => (
                     <div key={i} style={{ fontSize: '0.8125rem', marginTop: '4px' }}>
@@ -649,7 +716,7 @@ export const ReportIssue: React.FC<ReportIssueProps> = ({
               }}
             >
               <CheckCircle size={18} />
-              <span>All essential details present! You can proceed to final review.</span>
+              <span>All essential details present! Ready for final review.</span>
             </div>
           )}
 
@@ -658,11 +725,7 @@ export const ReportIssue: React.FC<ReportIssueProps> = ({
             <button className="md3-button-text" onClick={() => setCurrentStep(1)}>
               Back to Edit
             </button>
-            <button
-              className="md3-button-filled"
-              onClick={() => setCurrentStep(3)}
-              disabled={isAnalyzing}
-            >
+            <button className="md3-button-filled" onClick={() => setCurrentStep(3)} disabled={isAnalyzing}>
               <span>Proceed to Confirmation</span>
               <ArrowRight size={16} />
             </button>
@@ -670,22 +733,15 @@ export const ReportIssue: React.FC<ReportIssueProps> = ({
         </div>
       )}
 
-      {/* STEP 3: CONFIRMATION REVIEW CARD */}
+      {/* STEP 3: CONFIRMATION REVIEW & CHECKOUT CARD */}
       {currentStep === 3 && draft && (
         <div className="md3-card-elevated">
           <div style={{ marginBottom: '20px' }}>
-            <h2
-              style={{
-                fontSize: '1.25rem',
-                fontWeight: 600,
-                color: 'var(--md-sys-color-on-surface)',
-                marginBottom: '4px',
-              }}
-            >
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '4px' }}>
               Confirm Your Complaint Submission
             </h2>
             <p style={{ fontSize: '0.875rem', color: 'var(--md-sys-color-outline)' }}>
-              Verify the report details before creating a persistent ticket record.
+              Verify the report details and select service dispatch tier.
             </p>
           </div>
 
@@ -702,56 +758,16 @@ export const ReportIssue: React.FC<ReportIssueProps> = ({
             }}
           >
             {/* Student's Original Text vs AI Summary */}
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-                gap: '16px',
-              }}
-            >
-              <div
-                style={{
-                  backgroundColor: 'var(--md-sys-color-surface-container-low)',
-                  padding: '16px',
-                  borderRadius: 'var(--md-sys-shape-corner-m)',
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: '0.75rem',
-                    textTransform: 'uppercase',
-                    fontWeight: 700,
-                    color: 'var(--md-sys-color-outline)',
-                    marginBottom: '4px',
-                  }}
-                >
-                  Your Original Words
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+              <div style={{ backgroundColor: 'var(--md-sys-color-surface-container-low)', padding: '16px', borderRadius: 'var(--md-sys-shape-corner-m)' }}>
+                <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', fontWeight: 700, color: 'var(--md-sys-color-outline)', marginBottom: '4px' }}>
+                  Your Original Words ({draft.detectedLanguage})
                 </div>
-                <p style={{ fontSize: '0.9375rem', color: 'var(--md-sys-color-on-surface)' }}>
-                  "{complaintText}"
-                </p>
+                <p style={{ fontSize: '0.9375rem' }}>"{complaintText}"</p>
               </div>
 
-              <div
-                style={{
-                  backgroundColor: 'var(--md-sys-color-primary-container)',
-                  color: 'var(--md-sys-color-on-primary-container)',
-                  padding: '16px',
-                  borderRadius: 'var(--md-sys-shape-corner-m)',
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: '0.75rem',
-                    textTransform: 'uppercase',
-                    fontWeight: 700,
-                    color: 'var(--md-sys-color-on-primary-container)',
-                    marginBottom: '4px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                  }}
-                >
+              <div style={{ backgroundColor: 'var(--md-sys-color-primary-container)', color: 'var(--md-sys-color-on-primary-container)', padding: '16px', borderRadius: 'var(--md-sys-shape-corner-m)' }}>
+                <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', fontWeight: 700, marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <Sparkles size={14} /> AI Extraction Title & Summary
                 </div>
                 <div style={{ fontWeight: 600, fontSize: '0.9375rem', marginBottom: '4px' }}>
@@ -761,66 +777,56 @@ export const ReportIssue: React.FC<ReportIssueProps> = ({
               </div>
             </div>
 
-            {/* Structured Metadata */}
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-                gap: '12px',
-                paddingTop: '8px',
-              }}
-            >
-              <div>
-                <span style={{ fontSize: '0.75rem', color: 'var(--md-sys-color-outline)' }}>
-                  Category
-                </span>
-                <div style={{ marginTop: '4px' }}>
-                  <span className={getCategoryClass(draft.category)}>
-                    {draft.category.toUpperCase().replace('_', ' ')}
+            {/* Service Priority Selector */}
+            <div style={{ paddingTop: '8px' }}>
+              <span style={{ fontSize: '0.8125rem', fontWeight: 600, display: 'block', marginBottom: '8px' }}>
+                Choose Dispatch Level & Checkout Tier
+              </span>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div
+                  className="md3-card-outlined"
+                  onClick={() => setSelectedTier('standard')}
+                  style={{
+                    cursor: 'pointer',
+                    padding: '12px',
+                    borderColor: selectedTier === 'standard' ? 'var(--md-sys-color-primary)' : 'var(--md-sys-color-outline-variant)',
+                    backgroundColor: selectedTier === 'standard' ? 'rgba(0, 99, 155, 0.05)' : '#FFF',
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <strong style={{ fontSize: '0.875rem' }}>Standard Campus Plan</strong>
+                    <span style={{ color: 'var(--cat-cleanliness-color)', fontWeight: 700 }}>₹0 FREE</span>
+                  </div>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--md-sys-color-outline)' }}>
+                    Normal maintenance rotation
+                  </span>
+                </div>
+
+                <div
+                  className="md3-card-outlined"
+                  onClick={() => setSelectedTier('expedited_emergency')}
+                  style={{
+                    cursor: 'pointer',
+                    padding: '12px',
+                    borderColor: selectedTier === 'expedited_emergency' ? 'var(--cat-electricity-color)' : 'var(--md-sys-color-outline-variant)',
+                    backgroundColor: selectedTier === 'expedited_emergency' ? 'var(--cat-electricity-container)' : '#FFF',
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <strong style={{ fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <Zap size={13} color="#D97706" /> Rapid Dispatch
+                    </strong>
+                    <span style={{ color: '#B45309', fontWeight: 700 }}>₹499</span>
+                  </div>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--cat-electricity-on-container)' }}>
+                    Guaranteed 60-min emergency response
                   </span>
                 </div>
               </div>
-
-              <div>
-                <span style={{ fontSize: '0.75rem', color: 'var(--md-sys-color-outline)' }}>
-                  Target Department
-                </span>
-                <p style={{ fontWeight: 600, fontSize: '0.875rem', marginTop: '4px' }}>
-                  {draft.routingSuggestion}
-                </p>
-              </div>
-
-              <div>
-                <span style={{ fontSize: '0.75rem', color: 'var(--md-sys-color-outline)' }}>
-                  Location
-                </span>
-                <p style={{ fontWeight: 600, fontSize: '0.875rem', marginTop: '4px' }}>
-                  {building} {floor ? `• ${floor}` : ''} {room ? `• ${room}` : ''}
-                </p>
-              </div>
             </div>
-
-            {photoPreview && (
-              <div style={{ paddingTop: '8px' }}>
-                <span style={{ fontSize: '0.75rem', color: 'var(--md-sys-color-outline)' }}>
-                  Attached Photograph
-                </span>
-                <div style={{ marginTop: '6px' }}>
-                  <img
-                    src={photoPreview}
-                    alt="Complaint Evidence"
-                    style={{
-                      maxHeight: '120px',
-                      borderRadius: 'var(--md-sys-shape-corner-m)',
-                      border: '1px solid var(--md-sys-color-outline-variant)',
-                    }}
-                  />
-                </div>
-              </div>
-            )}
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <button className="md3-button-text" onClick={() => setCurrentStep(2)}>
               Back to Clarification
             </button>
@@ -837,7 +843,9 @@ export const ReportIssue: React.FC<ReportIssueProps> = ({
               ) : (
                 <>
                   <Send size={18} />
-                  <span>Submit Ticket</span>
+                  <span>
+                    {selectedTier === 'expedited_emergency' ? 'Submit & Proceed to Checkout' : 'Confirm & Submit Ticket'}
+                  </span>
                 </>
               )}
             </button>
@@ -868,7 +876,7 @@ export const ReportIssue: React.FC<ReportIssueProps> = ({
             Ticket Submitted Successfully!
           </h2>
           <p style={{ color: 'var(--md-sys-color-outline)', fontSize: '0.9375rem', marginBottom: '24px' }}>
-            Your maintenance concern has been catalogued and routed to the facilities desk.
+            Your concern is logged in the facilities lifecycle database.
           </p>
 
           <div
@@ -877,48 +885,82 @@ export const ReportIssue: React.FC<ReportIssueProps> = ({
               backgroundColor: 'var(--md-sys-color-surface-container-high)',
               padding: '16px 32px',
               borderRadius: 'var(--md-sys-shape-corner-l)',
-              marginBottom: '28px',
+              marginBottom: '20px',
             }}
           >
-            <span
-              style={{
-                fontSize: '0.75rem',
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em',
-                color: 'var(--md-sys-color-outline)',
-                display: 'block',
-                marginBottom: '4px',
-              }}
-            >
+            <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--md-sys-color-outline)', display: 'block', marginBottom: '4px' }}>
               Official Tracking Reference
             </span>
-            <span
-              style={{
-                fontSize: '1.5rem',
-                fontWeight: 700,
-                color: 'var(--md-sys-color-primary)',
-                fontFamily: 'monospace',
-                letterSpacing: '0.04em',
-              }}
-            >
+            <span style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--md-sys-color-primary)', fontFamily: 'monospace' }}>
               {createdTicket.reference}
             </span>
           </div>
 
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              gap: '12px',
-              flexWrap: 'wrap',
-            }}
-          >
+          {/* Checkout Status / Action */}
+          <div style={{ marginBottom: '28px' }}>
+            {createdTicket.paymentStatus === 'paid' ? (
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  backgroundColor: 'var(--cat-cleanliness-container)',
+                  color: 'var(--cat-cleanliness-on-container)',
+                  padding: '8px 18px',
+                  borderRadius: '999px',
+                  fontSize: '0.8125rem',
+                  fontWeight: 600,
+                }}
+              >
+                <BadgeCheck size={16} />
+                <span>Priority Emergency Checkout Paid (Ref: {createdTicket.checkoutReference})</span>
+              </div>
+            ) : selectedTier === 'expedited_emergency' ? (
+              <div>
+                <button className="md3-button-filled" onClick={() => setIsCheckoutOpen(true)}>
+                  <CreditCard size={16} />
+                  <span>Complete Secure Checkout for Rapid Response (₹499)</span>
+                </button>
+              </div>
+            ) : (
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  backgroundColor: 'var(--md-sys-color-surface-container)',
+                  padding: '6px 14px',
+                  borderRadius: '999px',
+                  fontSize: '0.8125rem',
+                  color: 'var(--md-sys-color-outline)',
+                }}
+              >
+                <ShieldCheck size={16} />
+                <span>Standard Student Plan • Campus Fee Waived (₹0)</span>
+              </div>
+            )}
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '12px' }}>
             <button className="md3-button-tonal" onClick={handleStartNewReport}>
               <RefreshCw size={16} />
               <span>Submit Another Complaint</span>
             </button>
           </div>
         </div>
+      )}
+
+      {/* Checkout Modal */}
+      {isCheckoutOpen && createdTicket && (
+        <CheckoutModal
+          ticket={createdTicket}
+          onClose={() => setIsCheckoutOpen(false)}
+          onPaymentCompleted={(receipt) => {
+            setCheckoutReceipt(receipt);
+            setCreatedTicket((prev) => (prev ? { ...prev, paymentStatus: 'paid', checkoutReference: receipt.transactionId } : null));
+            setIsCheckoutOpen(false);
+          }}
+        />
       )}
     </div>
   );

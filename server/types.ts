@@ -8,6 +8,10 @@ export type TicketStatus =
   | 'Blocked'
   | 'Resolved';
 
+export type UserRole = 'student' | 'staff' | 'admin';
+
+export type UrgencyLevel = 'low' | 'medium' | 'high' | 'critical';
+
 export const ALLOWED_CATEGORIES: Category[] = [
   'plumbing',
   'electricity',
@@ -32,6 +36,16 @@ export interface LocationData {
   details?: string;
 }
 
+export interface User {
+  id: string;
+  email: string;
+  passwordHash: string;
+  name: string;
+  role: UserRole;
+  department?: string;
+  createdAt: string;
+}
+
 export interface Ticket {
   id: string;
   reference: string;
@@ -50,6 +64,15 @@ export interface Ticket {
   clarifications: Array<{ question: string; answer: string }>;
   duplicateOf: string | null;
   hasDuplicateCandidates: boolean;
+  // Extended AI & Safety
+  urgencyLevel: UrgencyLevel;
+  safetyWarning?: string | null;
+  detectedLanguage?: string;
+  translatedText?: string | null;
+  // Checkout & Priority
+  paymentStatus: 'waived' | 'paid' | 'pending';
+  checkoutReference?: string | null;
+  priorityTier: 'standard' | 'expedited_emergency';
   createdAt: string;
   updatedAt: string;
 }
@@ -57,7 +80,7 @@ export interface Ticket {
 export interface TicketEvent {
   id: string;
   ticketId: string;
-  type: 'CREATED' | 'STATUS_CHANGE' | 'ASSIGNMENT' | 'NOTE' | 'DUPLICATE_LINK';
+  type: 'CREATED' | 'STATUS_CHANGE' | 'ASSIGNMENT' | 'NOTE' | 'DUPLICATE_LINK' | 'PAYMENT_CHECKOUT';
   fromStatus?: TicketStatus;
   toStatus?: TicketStatus;
   actorId: string;
@@ -77,6 +100,10 @@ export interface DraftAnalysis {
   routingSuggestion: string;
   routingReason: string;
   confidence: number;
+  urgencyLevel: UrgencyLevel;
+  safetyWarning: string | null;
+  detectedLanguage: string;
+  translatedText: string | null;
 }
 
 export interface DuplicateCandidate {
@@ -109,4 +136,35 @@ export interface RoutingRule {
   matchingTerms: string[];
   enabled: boolean;
   isDemo: boolean;
+}
+
+export interface CheckoutSession {
+  id: string;
+  ticketId?: string;
+  ticketReference?: string;
+  amount: number;
+  currency: string;
+  tier: 'standard' | 'expedited_emergency';
+  status: 'pending' | 'completed' | 'failed';
+  paymentMethod: string;
+  receiptHash: string;
+  paidAt?: string;
+  createdAt: string;
+}
+
+export interface TechnicianDiagnosis {
+  likelyRootCause: string;
+  recommendedTools: string[];
+  replacementParts: string[];
+  actionPlanSteps: string[];
+  estimatedRepairMinutes: number;
+}
+
+export interface ClusterPattern {
+  building: string;
+  category: Category;
+  ticketCount: number;
+  patternSummary: string;
+  systemicRisk: 'low' | 'medium' | 'high';
+  recommendedAction: string;
 }

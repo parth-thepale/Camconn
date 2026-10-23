@@ -6,6 +6,7 @@ import {
   Category,
   LocationData,
   STATUS_TRANSITIONS,
+  UrgencyLevel,
 } from '../types.js';
 
 export interface CreateTicketParams {
@@ -20,6 +21,13 @@ export interface CreateTicketParams {
   routingSuggestion: string;
   routingReason: string;
   clarifications?: Array<{ question: string; answer: string }>;
+  urgencyLevel?: UrgencyLevel;
+  safetyWarning?: string | null;
+  detectedLanguage?: string;
+  translatedText?: string | null;
+  priorityTier?: 'standard' | 'expedited_emergency';
+  paymentStatus?: 'waived' | 'paid' | 'pending';
+  checkoutReference?: string | null;
 }
 
 export interface TransitionStatusParams {
@@ -67,6 +75,13 @@ export class TicketService {
       clarifications: params.clarifications || [],
       duplicateOf: null,
       hasDuplicateCandidates: false,
+      urgencyLevel: params.urgencyLevel || 'medium',
+      safetyWarning: params.safetyWarning || null,
+      detectedLanguage: params.detectedLanguage || 'English',
+      translatedText: params.translatedText || null,
+      paymentStatus: params.paymentStatus || 'waived',
+      checkoutReference: params.checkoutReference || null,
+      priorityTier: params.priorityTier || 'standard',
       createdAt: now,
       updatedAt: now,
     };
@@ -79,7 +94,7 @@ export class TicketService {
       actorId: params.createdBy,
       actorName: params.creatorName || 'Student Reporter',
       actorRole: 'student',
-      note: 'Ticket submitted and queued for facilities triage.',
+      note: `Ticket submitted via CampusConnect intelligent reporting. Priority: ${ticket.priorityTier.toUpperCase()}. Urgency: ${ticket.urgencyLevel.toUpperCase()}.`,
       isInternal: false,
       createdAt: now,
     };
@@ -139,7 +154,6 @@ export class TicketService {
 
     const oldStatus = ticket.status;
     let nextStatus = ticket.status;
-    // Auto-advance Submitted or Acknowledged to Assigned
     if (oldStatus === 'Submitted' || oldStatus === 'Acknowledged') {
       nextStatus = 'Assigned';
     }
