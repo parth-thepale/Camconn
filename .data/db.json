@@ -1,0 +1,493 @@
+{
+  "nextTicketNumber": 108,
+  "routingRules": [
+    {
+      "id": "rule-plumbing-01",
+      "category": "plumbing",
+      "departmentLabel": "Facilities / Plumbing & Water Systems",
+      "sourceLabel": "Campus Maintenance Policy Section 4.1 (Demo Guideline)",
+      "matchingTerms": [
+        "leak",
+        "pipe",
+        "tap",
+        "washroom",
+        "water",
+        "drain",
+        "toilet",
+        "flush",
+        "sink",
+        "sewage"
+      ],
+      "enabled": true,
+      "isDemo": true
+    },
+    {
+      "id": "rule-electricity-01",
+      "category": "electricity",
+      "departmentLabel": "Estate Office / Electrical & Power Maintenance",
+      "sourceLabel": "Campus Electrical Safety Standard S-12 (Demo Guideline)",
+      "matchingTerms": [
+        "light",
+        "power",
+        "switch",
+        "spark",
+        "socket",
+        "plug",
+        "fan",
+        "air conditioner",
+        "ac",
+        "blackout",
+        "breaker"
+      ],
+      "enabled": true,
+      "isDemo": true
+    },
+    {
+      "id": "rule-cleanliness-01",
+      "category": "cleanliness",
+      "departmentLabel": "Sanitation & Housekeeping Services",
+      "sourceLabel": "Campus Hygiene & Waste Protocol H-03 (Demo Guideline)",
+      "matchingTerms": [
+        "garbage",
+        "trash",
+        "dustbin",
+        "cleaning",
+        "stain",
+        "spill",
+        "odour",
+        "dirt",
+        "litter",
+        "pest"
+      ],
+      "enabled": true,
+      "isDemo": true
+    },
+    {
+      "id": "rule-internet-01",
+      "category": "internet_connectivity",
+      "departmentLabel": "IT Services / Campus Network & Wi-Fi Operations",
+      "sourceLabel": "IT Infrastructure Service Charter IT-08 (Demo Guideline)",
+      "matchingTerms": [
+        "wifi",
+        "wi-fi",
+        "internet",
+        "network",
+        "lan",
+        "ethernet",
+        "connection",
+        "router",
+        "access point",
+        "portal",
+        "signal"
+      ],
+      "enabled": true,
+      "isDemo": true
+    }
+  ],
+  "duplicateReviews": [
+    {
+      "id": "rev-1792774981476-k6lk",
+      "ticketId": "ticket-1792774981474-jst42",
+      "candidateTicketId": "ticket-1792774981462-yagzo",
+      "state": "same_issue",
+      "reason": "Same washroom leak reported by a second observer.",
+      "reviewedBy": "Facilities Lead",
+      "reviewedAt": "2026-10-23T17:03:01.476Z"
+    }
+  ],
+  "tickets": [
+    {
+      "id": "ticket-1792775332077-gmfey",
+      "reference": "CC-2026-000107",
+      "createdBy": "student-test-01",
+      "creatorName": "Tanya Sen",
+      "originalText": "Wi-Fi connection keeps dropping completely in 2nd floor study carrels.",
+      "title": "Wi-Fi connection drops in 2nd floor study carrels",
+      "summary": "Frequent disconnections in Central Library 2nd floor study carrels.",
+      "category": "internet_connectivity",
+      "location": {
+        "building": "Central Library",
+        "floor": "2nd Floor",
+        "zone": "Study Carrels"
+      },
+      "status": "Submitted",
+      "assignedTo": null,
+      "photoUrl": null,
+      "routingSuggestion": "IT Services / Campus Network & Wi-Fi Operations",
+      "routingReason": "Matched Wi-Fi outage and network drops",
+      "clarifications": [],
+      "duplicateOf": null,
+      "hasDuplicateCandidates": true,
+      "createdAt": "2026-10-23T17:08:52.078Z",
+      "updatedAt": "2026-10-23T17:08:52.079Z"
+    },
+    {
+      "id": "ticket-1792774981474-jst42",
+      "reference": "CC-2026-000106",
+      "createdBy": "test-student-02",
+      "creatorName": "Second Student",
+      "originalText": "Water leaking all over the floor in 3rd floor washroom CV Raman centre.",
+      "title": "Flooding in 3rd floor washroom",
+      "summary": "Water on floor in washroom 302.",
+      "category": "plumbing",
+      "location": {
+        "building": "CV Raman Science Centre",
+        "floor": "3rd Floor",
+        "room": "Washroom 302"
+      },
+      "status": "Submitted",
+      "assignedTo": null,
+      "photoUrl": null,
+      "routingSuggestion": "Facilities / Plumbing & Water Systems",
+      "routingReason": "Matched plumbing keywords.",
+      "clarifications": [],
+      "duplicateOf": "CC-2026-000105",
+      "hasDuplicateCandidates": false,
+      "createdAt": "2026-10-23T17:03:01.475Z",
+      "updatedAt": "2026-10-23T17:03:01.477Z"
+    },
+    {
+      "id": "ticket-1792774981462-yagzo",
+      "reference": "CC-2026-000105",
+      "createdBy": "test-student-01",
+      "creatorName": "Test Student",
+      "originalText": "Severe water leak under washroom sink on 3rd floor CV Raman block.",
+      "title": "Water leak under washroom sink",
+      "summary": "Sink supply line leaking on 3rd floor washroom.",
+      "category": "plumbing",
+      "location": {
+        "building": "CV Raman Science Centre",
+        "floor": "3rd Floor",
+        "room": "Washroom 302"
+      },
+      "status": "Resolved",
+      "assignedTo": "Vikram Singh (Plumber)",
+      "photoUrl": null,
+      "routingSuggestion": "Facilities / Plumbing & Water Systems",
+      "routingReason": "Matched plumbing keywords and washroom location.",
+      "clarifications": [],
+      "duplicateOf": null,
+      "hasDuplicateCandidates": false,
+      "createdAt": "2026-10-23T17:03:01.463Z",
+      "updatedAt": "2026-10-23T17:03:01.472Z"
+    },
+    {
+      "id": "ticket-101",
+      "reference": "CC-2026-000101",
+      "createdBy": "student-ananya",
+      "creatorName": "Ananya Sharma (CS-2024)",
+      "originalText": "Water is dripping from the washroom ceiling on the 2nd floor right outside Lab 3. The floor is getting slippery and dangerous.",
+      "title": "Water leaking from washroom ceiling",
+      "summary": "Dripping ceiling water creating slip hazard outside Lab 3 on 2nd floor.",
+      "category": "plumbing",
+      "location": {
+        "building": "CV Raman Science Centre",
+        "floor": "2nd Floor",
+        "room": "Outside Lab 3 washroom"
+      },
+      "status": "Submitted",
+      "assignedTo": null,
+      "routingSuggestion": "Facilities / Plumbing & Water Systems",
+      "routingReason": "Campus Maintenance Policy Section 4.1: matched ceiling drip, washroom, and water hazard.",
+      "clarifications": [
+        {
+          "question": "Is the water actively flooding or just a steady drip?",
+          "answer": "It is a steady drip creating a puddle."
+        }
+      ],
+      "duplicateOf": null,
+      "hasDuplicateCandidates": true,
+      "createdAt": "2026-10-23T14:03:01.459Z",
+      "updatedAt": "2026-10-23T14:03:01.460Z"
+    },
+    {
+      "id": "ticket-102",
+      "reference": "CC-2026-000102",
+      "createdBy": "student-rohit",
+      "creatorName": "Rohit Verma (EE-2023)",
+      "originalText": "The main switchboard in lecture hall 204 buzzes whenever the projector is turned on. Two tube lights near the back keep flickering violently.",
+      "title": "Buzzing switchboard and flickering lights in LH 204",
+      "summary": "Electrical noise in main distribution board and flickering lighting during projector operation in LH 204.",
+      "category": "electricity",
+      "location": {
+        "building": "Aryabhata Academic Block",
+        "floor": "2nd Floor",
+        "room": "Lecture Hall 204"
+      },
+      "status": "In progress",
+      "assignedTo": "Rajesh Kumar (Senior Electrician)",
+      "routingSuggestion": "Estate Office / Electrical & Power Maintenance",
+      "routingReason": "Campus Electrical Safety Standard S-12: reports buzzing switchboard and flickering fixtures.",
+      "clarifications": [],
+      "duplicateOf": null,
+      "hasDuplicateCandidates": false,
+      "createdAt": "2026-10-23T09:03:01.460Z",
+      "updatedAt": "2026-10-23T15:03:01.460Z"
+    },
+    {
+      "id": "ticket-103",
+      "reference": "CC-2026-000103",
+      "createdBy": "student-priya",
+      "creatorName": "Priya Nair (BT-2025)",
+      "originalText": "The dry waste and organic waste bins near the canteen exit are completely overflowing since yesterday noon. Attracting flies.",
+      "title": "Overflowing waste receptacles near Canteen",
+      "summary": "Waste bins at canteen exit over capacity and attracting flies.",
+      "category": "cleanliness",
+      "location": {
+        "building": "Student Dining Hall & Canteen",
+        "floor": "Ground Floor",
+        "zone": "Canteen Exit Corridor"
+      },
+      "status": "Acknowledged",
+      "assignedTo": null,
+      "routingSuggestion": "Sanitation & Housekeeping Services",
+      "routingReason": "Campus Hygiene & Waste Protocol H-03: bin overflow and food residue accumulation.",
+      "clarifications": [],
+      "duplicateOf": null,
+      "hasDuplicateCandidates": false,
+      "createdAt": "2026-10-23T12:03:01.460Z",
+      "updatedAt": "2026-10-23T13:03:01.460Z"
+    },
+    {
+      "id": "ticket-104",
+      "reference": "CC-2026-000104",
+      "createdBy": "student-aditya",
+      "creatorName": "Aditya Gupta (ME-2024)",
+      "originalText": "Wi-Fi keeps disconnecting every two minutes in the quiet study zone of Central Library 1st floor. Error says IP configuration failure.",
+      "title": "Library 1st floor Wi-Fi DHCP disconnection",
+      "summary": "Frequent Wi-Fi drops and IP lease failures in Central Library quiet study area.",
+      "category": "internet_connectivity",
+      "location": {
+        "building": "Central Library",
+        "floor": "1st Floor",
+        "zone": "East Quiet Study Section"
+      },
+      "status": "Assigned",
+      "assignedTo": "Sunita Rao (Network Administrator)",
+      "routingSuggestion": "IT Services / Campus Network & Wi-Fi Operations",
+      "routingReason": "IT Infrastructure Service Charter IT-08: reports wireless disconnectivity and IP lease faults.",
+      "clarifications": [
+        {
+          "question": "Is the internet problem affecting one device or multiple devices?",
+          "answer": "Multiple laptop users in this row are experiencing it."
+        }
+      ],
+      "duplicateOf": null,
+      "hasDuplicateCandidates": false,
+      "createdAt": "2026-10-23T11:03:01.460Z",
+      "updatedAt": "2026-10-23T14:03:01.460Z"
+    }
+  ],
+  "ticketEvents": [
+    {
+      "id": "evt-101-1",
+      "ticketId": "ticket-101",
+      "type": "CREATED",
+      "toStatus": "Submitted",
+      "actorId": "student-ananya",
+      "actorName": "Ananya Sharma",
+      "actorRole": "student",
+      "note": "Ticket submitted via CampusConnect intelligent reporting.",
+      "isInternal": false,
+      "createdAt": "2026-10-23T14:03:01.460Z"
+    },
+    {
+      "id": "evt-102-1",
+      "ticketId": "ticket-102",
+      "type": "CREATED",
+      "toStatus": "Submitted",
+      "actorId": "student-rohit",
+      "actorName": "Rohit Verma",
+      "actorRole": "student",
+      "note": "Ticket created with attached location details.",
+      "isInternal": false,
+      "createdAt": "2026-10-23T09:03:01.460Z"
+    },
+    {
+      "id": "evt-102-2",
+      "ticketId": "ticket-102",
+      "type": "ASSIGNMENT",
+      "fromStatus": "Submitted",
+      "toStatus": "Assigned",
+      "actorId": "staff-admin",
+      "actorName": "Chief Warden Office",
+      "actorRole": "staff",
+      "note": "Assigned to Rajesh Kumar for urgent electrical inspection.",
+      "isInternal": false,
+      "createdAt": "2026-10-23T11:03:01.460Z"
+    },
+    {
+      "id": "evt-102-3",
+      "ticketId": "ticket-102",
+      "type": "STATUS_CHANGE",
+      "fromStatus": "Assigned",
+      "toStatus": "In progress",
+      "actorId": "staff-rajesh",
+      "actorName": "Rajesh Kumar",
+      "actorRole": "staff",
+      "note": "Electrician on site with multimeter and replacement choke units.",
+      "isInternal": false,
+      "createdAt": "2026-10-23T15:03:01.460Z"
+    },
+    {
+      "id": "evt-103-1",
+      "ticketId": "ticket-103",
+      "type": "CREATED",
+      "toStatus": "Submitted",
+      "actorId": "student-priya",
+      "actorName": "Priya Nair",
+      "actorRole": "student",
+      "note": "Cleanliness report submitted.",
+      "isInternal": false,
+      "createdAt": "2026-10-23T12:03:01.460Z"
+    },
+    {
+      "id": "evt-103-2",
+      "ticketId": "ticket-103",
+      "type": "STATUS_CHANGE",
+      "fromStatus": "Submitted",
+      "toStatus": "Acknowledged",
+      "actorId": "staff-sanitation",
+      "actorName": "Sanitation Supervisor",
+      "actorRole": "staff",
+      "note": "Scheduled for afternoon waste clearance round.",
+      "isInternal": false,
+      "createdAt": "2026-10-23T13:03:01.460Z"
+    },
+    {
+      "id": "evt-104-1",
+      "ticketId": "ticket-104",
+      "type": "CREATED",
+      "toStatus": "Submitted",
+      "actorId": "student-aditya",
+      "actorName": "Aditya Gupta",
+      "actorRole": "student",
+      "note": "Ticket submitted.",
+      "isInternal": false,
+      "createdAt": "2026-10-23T11:03:01.460Z"
+    },
+    {
+      "id": "evt-104-2",
+      "ticketId": "ticket-104",
+      "type": "ASSIGNMENT",
+      "fromStatus": "Submitted",
+      "toStatus": "Assigned",
+      "actorId": "staff-admin",
+      "actorName": "IT Helpdesk Lead",
+      "actorRole": "staff",
+      "note": "Assigned to Sunita Rao (Network Administrator) to check AP-04 DHCP pool.",
+      "isInternal": false,
+      "createdAt": "2026-10-23T14:03:01.460Z"
+    },
+    {
+      "id": "evt-1792774981463-1",
+      "ticketId": "ticket-1792774981462-yagzo",
+      "type": "CREATED",
+      "toStatus": "Submitted",
+      "actorId": "test-student-01",
+      "actorName": "Test Student",
+      "actorRole": "student",
+      "note": "Ticket submitted and queued for facilities triage.",
+      "isInternal": false,
+      "createdAt": "2026-10-23T17:03:01.463Z"
+    },
+    {
+      "id": "evt-1792774981467-474t",
+      "ticketId": "ticket-1792774981462-yagzo",
+      "type": "STATUS_CHANGE",
+      "fromStatus": "Submitted",
+      "toStatus": "Acknowledged",
+      "actorId": "staff-1",
+      "actorName": "Triage Staff",
+      "actorRole": "staff",
+      "note": "Acknowledged by plumbing triage desk.",
+      "isInternal": false,
+      "createdAt": "2026-10-23T17:03:01.466Z"
+    },
+    {
+      "id": "evt-1792774981469-qgex",
+      "ticketId": "ticket-1792774981462-yagzo",
+      "type": "ASSIGNMENT",
+      "fromStatus": "Acknowledged",
+      "toStatus": "Assigned",
+      "actorId": "staff-1",
+      "actorName": "Triage Staff",
+      "actorRole": "staff",
+      "note": "Assigned Vikram to inspect leak.",
+      "isInternal": false,
+      "createdAt": "2026-10-23T17:03:01.469Z"
+    },
+    {
+      "id": "evt-1792774981471-zthu",
+      "ticketId": "ticket-1792774981462-yagzo",
+      "type": "STATUS_CHANGE",
+      "fromStatus": "Assigned",
+      "toStatus": "In progress",
+      "actorId": "staff-vikram",
+      "actorName": "Vikram Singh",
+      "actorRole": "staff",
+      "note": "Replacing washers on cold water feed valve.",
+      "isInternal": false,
+      "createdAt": "2026-10-23T17:03:01.470Z"
+    },
+    {
+      "id": "evt-1792774981473-uccw",
+      "ticketId": "ticket-1792774981462-yagzo",
+      "type": "STATUS_CHANGE",
+      "fromStatus": "In progress",
+      "toStatus": "Resolved",
+      "actorId": "staff-vikram",
+      "actorName": "Vikram Singh",
+      "actorRole": "staff",
+      "note": "Replaced cracked connector pipe and tested water pressure for 15 minutes. Area is dry.",
+      "isInternal": false,
+      "createdAt": "2026-10-23T17:03:01.472Z"
+    },
+    {
+      "id": "evt-1792774981475-1",
+      "ticketId": "ticket-1792774981474-jst42",
+      "type": "CREATED",
+      "toStatus": "Submitted",
+      "actorId": "test-student-02",
+      "actorName": "Second Student",
+      "actorRole": "student",
+      "note": "Ticket submitted and queued for facilities triage.",
+      "isInternal": false,
+      "createdAt": "2026-10-23T17:03:01.475Z"
+    },
+    {
+      "id": "evt-1792774981478-dup1",
+      "ticketId": "ticket-1792774981474-jst42",
+      "type": "DUPLICATE_LINK",
+      "actorId": "staff-lead",
+      "actorName": "Facilities Lead",
+      "actorRole": "staff",
+      "note": "Linked as duplicate of CC-2026-000105: Same washroom leak reported by a second observer.",
+      "isInternal": false,
+      "createdAt": "2026-10-23T17:03:01.476Z"
+    },
+    {
+      "id": "evt-1792774981479-dup2",
+      "ticketId": "ticket-1792774981462-yagzo",
+      "type": "DUPLICATE_LINK",
+      "actorId": "staff-lead",
+      "actorName": "Facilities Lead",
+      "actorRole": "staff",
+      "note": "Linked duplicate report CC-2026-000106 associated with this incident: Same washroom leak reported by a second observer.",
+      "isInternal": false,
+      "createdAt": "2026-10-23T17:03:01.476Z"
+    },
+    {
+      "id": "evt-1792775332078-1",
+      "ticketId": "ticket-1792775332077-gmfey",
+      "type": "CREATED",
+      "toStatus": "Submitted",
+      "actorId": "student-test-01",
+      "actorName": "Tanya Sen",
+      "actorRole": "student",
+      "note": "Ticket submitted and queued for facilities triage.",
+      "isInternal": false,
+      "createdAt": "2026-10-23T17:08:52.078Z"
+    }
+  ]
+}

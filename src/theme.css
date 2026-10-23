@@ -1,0 +1,386 @@
+:root {
+  /* Material 3 Light Color System */
+  --md-sys-color-primary: #00639B;
+  --md-sys-color-on-primary: #FFFFFF;
+  --md-sys-color-primary-container: #CDE5FF;
+  --md-sys-color-on-primary-container: #001D32;
+
+  --md-sys-color-secondary: #51606F;
+  --md-sys-color-on-secondary: #FFFFFF;
+  --md-sys-color-secondary-container: #D5E4F7;
+  --md-sys-color-on-secondary-container: #0E1D2A;
+
+  --md-sys-color-tertiary: #695779;
+  --md-sys-color-on-tertiary: #FFFFFF;
+  --md-sys-color-tertiary-container: #F1DBFF;
+  --md-sys-color-on-tertiary-container: #241532;
+
+  --md-sys-color-error: #BA1A1A;
+  --md-sys-color-on-error: #FFFFFF;
+  --md-sys-color-error-container: #FFDAD6;
+  --md-sys-color-on-error-container: #410002;
+
+  --md-sys-color-background: #FDFBFF;
+  --md-sys-color-on-background: #1A1C1E;
+  
+  --md-sys-color-surface: #FDFBFF;
+  --md-sys-color-on-surface: #1A1C1E;
+  --md-sys-color-surface-variant: #DFE2EB;
+  --md-sys-color-on-surface-variant: #43474E;
+  
+  --md-sys-color-surface-container-lowest: #FFFFFF;
+  --md-sys-color-surface-container-low: #F3F3FA;
+  --md-sys-color-surface-container: #ECEEF4;
+  --md-sys-color-surface-container-high: #E6E8EF;
+  --md-sys-color-surface-container-highest: #E0E2E9;
+
+  --md-sys-color-outline: #73777F;
+  --md-sys-color-outline-variant: #C3C7CF;
+
+  /* Category Specific MD3 Tones */
+  --cat-plumbing-container: #D1F0FA;
+  --cat-plumbing-on-container: #00363F;
+  --cat-plumbing-color: #006877;
+
+  --cat-electricity-container: #FFE5A3;
+  --cat-electricity-on-container: #3E2D00;
+  --cat-electricity-color: #7A5900;
+
+  --cat-cleanliness-container: #CEF3D6;
+  --cat-cleanliness-on-container: #00391A;
+  --cat-cleanliness-color: #1A6C3A;
+
+  --cat-internet-container: #E4DFFF;
+  --cat-internet-on-container: #1C1951;
+  --cat-internet-color: #4E5196;
+
+  /* Elevation Shadows */
+  --md-sys-elevation-1: 0px 1px 3px 1px rgba(0, 0, 0, 0.1), 0px 1px 2px 0px rgba(0, 0, 0, 0.06);
+  --md-sys-elevation-2: 0px 2px 6px 2px rgba(0, 0, 0, 0.12), 0px 1px 2px 0px rgba(0, 0, 0, 0.08);
+  --md-sys-elevation-3: 0px 4px 8px 3px rgba(0, 0, 0, 0.14), 0px 1px 3px 0px rgba(0, 0, 0, 0.1);
+  --md-sys-elevation-4: 0px 6px 12px 4px rgba(0, 0, 0, 0.16), 0px 2px 4px 0px rgba(0, 0, 0, 0.12);
+
+  /* MD3 Corner Radii */
+  --md-sys-shape-corner-xs: 4px;
+  --md-sys-shape-corner-s: 8px;
+  --md-sys-shape-corner-m: 12px;
+  --md-sys-shape-corner-l: 16px;
+  --md-sys-shape-corner-xl: 28px;
+  --md-sys-shape-corner-full: 9999px;
+
+  /* Typography */
+  --md-sys-typescale-font: 'Roboto', 'Google Sans', system-ui, -apple-system, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--md-sys-typescale-font);
+  background-color: var(--md-sys-color-background);
+  color: var(--md-sys-color-on-background);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Material 3 Buttons */
+.md3-button-filled {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+  border: none;
+  border-radius: var(--md-sys-shape-corner-full);
+  padding: 10px 24px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: var(--md-sys-elevation-1);
+  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+.md3-button-filled:hover:not(:disabled) {
+  box-shadow: var(--md-sys-elevation-2);
+  filter: brightness(1.08);
+}
+.md3-button-filled:active:not(:disabled) {
+  filter: brightness(0.95);
+}
+.md3-button-filled:disabled {
+  background-color: rgba(26, 28, 30, 0.12);
+  color: rgba(26, 28, 30, 0.38);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.md3-button-tonal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+  border: none;
+  border-radius: var(--md-sys-shape-corner-full);
+  padding: 10px 20px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+.md3-button-tonal:hover:not(:disabled) {
+  box-shadow: var(--md-sys-elevation-1);
+  filter: brightness(0.96);
+}
+
+.md3-button-outlined {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: transparent;
+  color: var(--md-sys-color-primary);
+  border: 1px solid var(--md-sys-color-outline);
+  border-radius: var(--md-sys-shape-corner-full);
+  padding: 10px 20px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+.md3-button-outlined:hover:not(:disabled) {
+  background-color: rgba(0, 99, 155, 0.08);
+}
+
+.md3-button-text {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: transparent;
+  color: var(--md-sys-color-primary);
+  border: none;
+  border-radius: var(--md-sys-shape-corner-full);
+  padding: 8px 16px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+.md3-button-text:hover {
+  background-color: rgba(0, 99, 155, 0.08);
+}
+
+/* Material 3 Cards */
+.md3-card-elevated {
+  background-color: var(--md-sys-color-surface-container-low);
+  border-radius: var(--md-sys-shape-corner-l);
+  box-shadow: var(--md-sys-elevation-1);
+  padding: 20px;
+  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+.md3-card-elevated:hover {
+  box-shadow: var(--md-sys-elevation-2);
+}
+
+.md3-card-filled {
+  background-color: var(--md-sys-color-surface-container);
+  border-radius: var(--md-sys-shape-corner-l);
+  padding: 20px;
+}
+
+.md3-card-outlined {
+  background-color: var(--md-sys-color-surface);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--md-sys-shape-corner-l);
+  padding: 20px;
+  transition: all 0.2s ease;
+}
+
+/* Material 3 Chips */
+.md3-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: var(--md-sys-shape-corner-s);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.chip-plumbing {
+  background-color: var(--cat-plumbing-container);
+  color: var(--cat-plumbing-on-container);
+  border: 1px solid rgba(0, 104, 119, 0.2);
+}
+.chip-electricity {
+  background-color: var(--cat-electricity-container);
+  color: var(--cat-electricity-on-container);
+  border: 1px solid rgba(122, 89, 0, 0.2);
+}
+.chip-cleanliness {
+  background-color: var(--cat-cleanliness-container);
+  color: var(--cat-cleanliness-on-container);
+  border: 1px solid rgba(26, 108, 58, 0.2);
+}
+.chip-internet_connectivity {
+  background-color: var(--cat-internet-container);
+  color: var(--cat-internet-on-container);
+  border: 1px solid rgba(78, 81, 150, 0.2);
+}
+
+/* Status Badges */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: var(--md-sys-shape-corner-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.status-submitted {
+  background-color: #E2E3E8;
+  color: #3C4048;
+}
+.status-acknowledged {
+  background-color: #D3E4FD;
+  color: #0B57D0;
+}
+.status-assigned {
+  background-color: #E8DEF8;
+  color: #65558F;
+}
+.status-in-progress {
+  background-color: #FFE6A8;
+  color: #735400;
+}
+.status-blocked {
+  background-color: #FFDAD6;
+  color: #BA1A1A;
+}
+.status-resolved {
+  background-color: #C4EED0;
+  color: #0F5223;
+}
+
+/* Material 3 Text Field */
+.md3-textfield {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.md3-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--md-sys-color-on-surface-variant);
+}
+.md3-input, .md3-textarea, .md3-select {
+  font-family: inherit;
+  font-size: 0.9375rem;
+  color: var(--md-sys-color-on-surface);
+  background-color: var(--md-sys-color-surface-container-lowest);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--md-sys-shape-corner-s);
+  padding: 12px 14px;
+  outline: none;
+  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+.md3-input:focus, .md3-textarea:focus, .md3-select:focus {
+  border-color: var(--md-sys-color-primary);
+  box-shadow: 0 0 0 2px rgba(0, 99, 155, 0.2);
+}
+.md3-input::placeholder, .md3-textarea::placeholder {
+  color: var(--md-sys-color-outline);
+}
+
+/* Material 3 Segmented Buttons */
+.md3-segmented-button-group {
+  display: inline-flex;
+  background-color: var(--md-sys-color-surface-container-high);
+  border-radius: var(--md-sys-shape-corner-full);
+  padding: 4px;
+  gap: 2px;
+}
+.md3-segment {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  border-radius: var(--md-sys-shape-corner-full);
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: none;
+  background-color: transparent;
+  color: var(--md-sys-color-on-surface-variant);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.md3-segment.active {
+  background-color: var(--md-sys-color-surface-container-lowest);
+  color: var(--md-sys-color-primary);
+  box-shadow: var(--md-sys-elevation-1);
+}
+
+/* Modal Backdrop & Dialog */
+.md3-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+.md3-dialog {
+  background-color: var(--md-sys-color-surface-container-low);
+  border-radius: var(--md-sys-shape-corner-xl);
+  box-shadow: var(--md-sys-elevation-3);
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 28px;
+}
+
+/* Timeline */
+.md3-timeline {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  padding-left: 28px;
+}
+.md3-timeline::before {
+  content: '';
+  position: absolute;
+  top: 14px;
+  bottom: 14px;
+  left: 11px;
+  width: 2px;
+  background-color: var(--md-sys-color-surface-variant);
+}
+.md3-timeline-item {
+  position: relative;
+  margin-bottom: 20px;
+}
+.md3-timeline-bead {
+  position: absolute;
+  left: -28px;
+  top: 4px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: var(--md-sys-color-primary);
+  border: 2px solid #FFFFFF;
+  box-shadow: 0 0 0 2px var(--md-sys-color-primary);
+}
