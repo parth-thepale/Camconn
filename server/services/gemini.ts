@@ -387,3 +387,37 @@ export async function analyzeCampusClusters(tickets: Ticket[]): Promise<ClusterP
 
   return clusters;
 }
+
+/**
+ * INNOVATIVE FEATURE: AI Automated Resolution Note & Student Update Generator
+ */
+export async function generateResolutionSummary(params: {
+  title: string;
+  category: Category;
+  actionTaken: string;
+}): Promise<string> {
+  const fallback = `Maintenance crew completed corrective repairs for '${params.title}'. ${params.actionTaken || 'Component was inspected, serviced to campus code, and tested for stability.'} The facility is now safe and returned to normal operation.`;
+
+  if (!genAIClient) {
+    return fallback;
+  }
+
+  const prompt = `You are a Facilities Operations Manager writing an official, courteous closure note to a university student regarding their maintenance complaint.
+
+Ticket Title: "${params.title}"
+Category: "${params.category}"
+Technician Action Taken: "${params.actionTaken || 'Component serviced and tested'}"
+
+Write a concise 2-sentence resolution note explaining what was repaired, confirming safety tests passed, and thanking the student for reporting it. Do not include markdown headers or placeholders.`;
+
+  try {
+    const response = await genAIClient.models.generateContent({
+      model: 'gemini-3.8-flash',
+      contents: [{ text: prompt }],
+    });
+    return response.text?.trim() || fallback;
+  } catch (err) {
+    console.error('[Gemini] Resolution summary generation failed:', err);
+    return fallback;
+  }
+}

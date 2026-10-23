@@ -145,6 +145,21 @@ export async function fetchCampusClusters(): Promise<ClusterPattern[]> {
   return data.clusters || [];
 }
 
+export async function fetchResolutionSummary(params: {
+  title: string;
+  category: Category;
+  actionTaken?: string;
+}): Promise<string> {
+  const res = await fetch(`${API_BASE}/ai/resolution-note`, {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify(params),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Failed to generate resolution summary');
+  return data.note;
+}
+
 // Tickets API
 export async function submitConfirmedTicket(params: {
   originalText: string;

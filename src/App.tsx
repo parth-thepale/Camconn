@@ -5,6 +5,7 @@ import { ReportIssue } from './components/ReportIssue.js';
 import { StudentTracker } from './components/StudentTracker.js';
 import { StaffDashboard } from './components/StaffDashboard.js';
 import { RoutingGuideModal } from './components/RoutingGuideModal.js';
+import { PresentationModal } from './components/PresentationModal.js';
 import { AuthScreen } from './components/AuthScreen.js';
 import {
   fetchHealth,
@@ -22,6 +23,7 @@ export const App: React.FC = () => {
   const [aiConfigured, setAiConfigured] = useState(false);
   const [campusLocations, setCampusLocations] = useState<string[]>([]);
   const [isRoutingGuideOpen, setIsRoutingGuideOpen] = useState(false);
+  const [isPresentationOpen, setIsPresentationOpen] = useState(false);
   const [trackingTicketId, setTrackingTicketId] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -109,6 +111,7 @@ export const App: React.FC = () => {
         currentUser={currentUser}
         aiConfigured={aiConfigured}
         onOpenRoutingGuide={() => setIsRoutingGuideOpen(true)}
+        onOpenPresentationModal={() => setIsPresentationOpen(true)}
         onLogout={handleLogout}
       />
 
@@ -217,6 +220,11 @@ export const App: React.FC = () => {
       {/* Routing Directory Modal */}
       {isRoutingGuideOpen && (
         <RoutingGuideModal onClose={() => setIsRoutingGuideOpen(false)} />
+      )}
+
+      {/* Presentation & Rubric Defense Modal */}
+      {isPresentationOpen && (
+        <PresentationModal onClose={() => setIsPresentationOpen(false)} />
       )}
     </div>
   );

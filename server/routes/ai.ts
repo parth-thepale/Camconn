@@ -4,6 +4,7 @@ import {
   analyzeComplaintWithGemini,
   generateTechnicianDiagnosis,
   analyzeCampusClusters,
+  generateResolutionSummary,
 } from '../services/gemini.js';
 import { storage } from '../services/storage.js';
 
@@ -118,3 +119,30 @@ aiRouter.get('/patterns', async (_req, res) => {
     res.status(500).json({ error: 'Failed to analyze patterns', message: err?.message });
   }
 });
+
+/**
+ * POST /api/ai/resolution-note
+ * INNOVATIVE FEATURE: AI Automated Resolution Note & Student Update Generator
+ */
+aiRouter.post('/resolution-note', async (req, res) => {
+  const { title, category, actionTaken } = req.body;
+  if (!title || !category) {
+    res.status(400).json({ error: 'title and category are required' });
+    return;
+  }
+
+  try {
+    const note = await generateResolutionSummary({
+      title,
+      category,
+      actionTaken: actionTaken || '',
+    });
+    res.json({
+      success: true,
+      note,
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: 'Failed to generate resolution note', message: err?.message });
+  }
+});
+

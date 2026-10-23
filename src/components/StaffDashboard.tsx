@@ -33,6 +33,7 @@ import {
   fetchTicketDetails,
   updateTicketStatus,
   assignTicket,
+  fetchResolutionSummary,
 } from '../api.js';
 import { DuplicateReviewModal } from './DuplicateReviewModal.js';
 import { TechnicianDiagnosisModal } from './TechnicianDiagnosisModal.js';
@@ -66,6 +67,26 @@ export const StaffDashboard: React.FC = () => {
 
   const [assigneeInput, setAssigneeInput] = useState('');
   const [isAssigning, setIsAssigning] = useState(false);
+  const [isGeneratingNote, setIsGeneratingNote] = useState(false);
+
+  const handleGenerateAiNote = async () => {
+    if (!selectedTicket) return;
+    setIsGeneratingNote(true);
+    try {
+      const note = await fetchResolutionSummary({
+        title: selectedTicket.title,
+        category: selectedTicket.category,
+        actionTaken: assigneeInput
+          ? `Technician ${assigneeInput} conducted diagnostics and resolved fault.`
+          : 'Campus maintenance team conducted diagnostics and completed repairs.',
+      });
+      setStatusNote(note);
+    } catch (err: any) {
+      console.error('Failed to generate resolution summary:', err);
+    } finally {
+      setIsGeneratingNote(false);
+    }
+  };
 
   // Modals state
   const [reviewingDuplicateTicket, setReviewingDuplicateTicket] = useState<Ticket | null>(null);
@@ -595,6 +616,38 @@ export const StaffDashboard: React.FC = () => {
                       </option>
                     ))}
                   </select>
+
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <label style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--md-sys-color-on-surface-variant)' }}>
+                      Audit Transition Note <span style={{ color: 'var(--md-sys-color-error)' }}>*</span>
+                    </label>
+                    <button
+                      type="button"
+                      className="md3-button-text"
+                      onClick={handleGenerateAiNote}
+                      disabled={isGeneratingNote}
+                      style={{
+                        fontSize: '0.75rem',
+                        padding: '2px 8px',
+                        color: 'var(--md-sys-color-primary)',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                      }}
+                    >
+                      {isGeneratingNote ? (
+                        <>
+                          <Loader2 size={13} className="spin-icon" />
+                          <span>Generating...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles size={13} />
+                          <span>✨ AI Auto-Draft Note</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
 
                   <input
                     type="text"

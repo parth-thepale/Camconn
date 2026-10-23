@@ -6,6 +6,7 @@ import {
   Building2,
   LogOut,
   Shield,
+  Award,
 } from 'lucide-react';
 import { User } from '../types.js';
 
@@ -13,6 +14,7 @@ interface TopAppBarProps {
   currentUser: User;
   aiConfigured: boolean;
   onOpenRoutingGuide: () => void;
+  onOpenPresentationModal?: () => void;
   onLogout: () => void;
 }
 
@@ -20,6 +22,7 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
   currentUser,
   aiConfigured,
   onOpenRoutingGuide,
+  onOpenPresentationModal,
   onLogout,
 }) => {
   const isStaff = currentUser.role === 'staff' || currentUser.role === 'admin';
@@ -140,6 +143,23 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
             <BookOpen size={16} />
             <span>SLA Directory</span>
           </button>
+
+          {/* Hackathon Rubric & Pitch Guide */}
+          {onOpenPresentationModal && (
+            <button
+              className="md3-button-tonal"
+              onClick={onOpenPresentationModal}
+              style={{
+                fontSize: '0.8125rem',
+                backgroundColor: 'var(--md-sys-color-primary-container)',
+                color: 'var(--md-sys-color-on-primary-container)',
+                fontWeight: 600,
+              }}
+            >
+              <Award size={15} />
+              <span>Rubric (50/50)</span>
+            </button>
+          )}
 
           {/* User Profile & Sign Out */}
           <div

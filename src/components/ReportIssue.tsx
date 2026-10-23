@@ -17,10 +17,86 @@ import {
   Zap,
   ShieldCheck,
   CreditCard,
+  Mic,
+  MicOff,
+  Droplet,
+  Wifi,
+  DoorClosed,
+  Flame,
 } from 'lucide-react';
 import { DraftAnalysis, LocationData, Ticket, Category, User } from '../types.js';
 import { generateAiDraft, submitConfirmedTicket } from '../api.js';
 import { CheckoutModal } from './CheckoutModal.js';
+
+interface QuickTemplate {
+  id: string;
+  label: string;
+  category: Category;
+  icon: any;
+  building: string;
+  floor: string;
+  room: string;
+  text: string;
+  badge: string;
+}
+
+const AI_QUICK_TEMPLATES: QuickTemplate[] = [
+  {
+    id: 'sparks',
+    label: 'Electrical Sparks & Odor',
+    category: 'electricity',
+    icon: Zap,
+    building: 'Block B - Electrical & Science Wing',
+    floor: '2nd Floor',
+    room: 'Lab 204',
+    text: 'Switchboard near Lab 204 is sparking violently with smoke and burning plastic odor. Circuit breaker needs urgent shutdown.',
+    badge: 'Critical Hazard (Level 4/5)',
+  },
+  {
+    id: 'pipe-burst',
+    label: 'Washroom Flooding (Hindi/Hinglish)',
+    category: 'water',
+    icon: Droplet,
+    building: 'Block A - Academic Complex',
+    floor: '2nd Floor',
+    room: 'Restroom A-202',
+    text: '2nd floor washroom me overhead pipe burst ho gaya hai, ceiling se continuous paani tapak raha hai aur corridor me slip hazard create ho raha hai.',
+    badge: 'Auto-Translates to English',
+  },
+  {
+    id: 'wifi-down',
+    label: 'Wi-Fi AP Blackout',
+    category: 'it',
+    icon: Wifi,
+    building: 'Central Library & Media Center',
+    floor: '3rd Floor',
+    room: 'Digital Reading Wing',
+    text: 'All Cisco Wi-Fi access points on the 3rd floor are blinking amber. Entire wing has lost connectivity during online placement tests.',
+    badge: 'Priority SLA 2h',
+  },
+  {
+    id: 'hvac-alarm',
+    label: 'Server Room HVAC Alarm',
+    category: 'hvac',
+    icon: Flame,
+    building: 'Admin & Executive Tower',
+    floor: '1st Floor',
+    room: 'Server Room 102',
+    text: 'Server room AC unit #2 compressor stopped spinning and temperature alarm is beeping at 34°C with audible warning.',
+    badge: 'Hardware Safety Risk',
+  },
+  {
+    id: 'fire-exit',
+    label: 'Emergency Exit Jammed',
+    category: 'carpentry',
+    icon: DoorClosed,
+    building: 'Student Center & Cafeteria',
+    floor: 'Ground Floor',
+    room: 'Auditorium Exit West',
+    text: 'Emergency fire exit push bar latch is jammed shut and will not unlatch from inside, creating a safety compliance violation.',
+    badge: 'Safety Hazard',
+  },
+];
 
 interface ReportIssueProps {
   campusLocations: string[];
@@ -58,6 +134,66 @@ export const ReportIssue: React.FC<ReportIssueProps> = ({
   const [selectedTier, setSelectedTier] = useState<'standard' | 'expedited_emergency'>('standard');
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [checkoutReceipt, setCheckoutReceipt] = useState<any | null>(null);
+
+  // Voice dictation & template state
+  const [isListening, setIsListening] = useState(false);
+  const [activeTemplateId, setActiveTemplateId] = useState<string | null>(null);
+
+  const toggleVoiceDictation = () => {
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert('Voice dictation is supported in modern browsers with microphone permissions.');
+      return;
+    }
+
+    if (isListening) {
+      setIsListening(false);
+      return;
+    }
+
+    try {
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'en-IN';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      recognition.onstart = () => {
+        setIsListening(true);
+      };
+
+      recognition.onresult = (event: any) => {
+        const transcript = event.results?.[0]?.[0]?.transcript;
+        if (transcript) {
+          setComplaintText((prev) => (prev ? `${prev} ${transcript}` : transcript));
+        }
+        setIsListening(false);
+      };
+
+      recognition.onerror = (event: any) => {
+        console.warn('Speech recognition warning:', event.error);
+        setIsListening(false);
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognition.start();
+    } catch (err) {
+      console.warn('Speech recognition start failed:', err);
+      setIsListening(false);
+    }
+  };
+
+  const handleApplyTemplate = (tmpl: QuickTemplate) => {
+    setActiveTemplateId(tmpl.id);
+    setComplaintText(tmpl.text);
+    setBuilding(tmpl.building);
+    setFloor(tmpl.floor);
+    setRoom(tmpl.room);
+    setErrorMessage(null);
+  };
 
   // Submission state
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -341,17 +477,132 @@ export const ReportIssue: React.FC<ReportIssueProps> = ({
             </p>
           </div>
 
+          {/* AI Quick Scenario Templates */}
+          <div style={{ marginBottom: '20px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+              <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--md-sys-color-primary)', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                <Sparkles size={14} /> Quick AI Scenarios (1-Tap Fill)
+              </span>
+              <span style={{ fontSize: '0.75rem', color: 'var(--md-sys-color-outline)' }}>
+                Tap any template to auto-populate
+              </span>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '8px' }}>
+              {AI_QUICK_TEMPLATES.map((tmpl) => {
+                const IconComponent = tmpl.icon;
+                const isSelected = activeTemplateId === tmpl.id;
+                return (
+                  <button
+                    key={tmpl.id}
+                    type="button"
+                    onClick={() => handleApplyTemplate(tmpl)}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'flex-start',
+                      padding: '10px 12px',
+                      borderRadius: 'var(--md-sys-shape-corner-m)',
+                      border: isSelected
+                        ? '2px solid var(--md-sys-color-primary)'
+                        : '1px solid var(--md-sys-color-outline-variant)',
+                      backgroundColor: isSelected
+                        ? 'var(--md-sys-color-primary-container)'
+                        : 'var(--md-sys-color-surface-container-low)',
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                      transition: 'all 0.15s ease-in-out',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px', width: '100%' }}>
+                      <IconComponent
+                        size={15}
+                        color={isSelected ? 'var(--md-sys-color-on-primary-container)' : 'var(--md-sys-color-primary)'}
+                      />
+                      <span
+                        style={{
+                          fontSize: '0.8125rem',
+                          fontWeight: 600,
+                          color: isSelected
+                            ? 'var(--md-sys-color-on-primary-container)'
+                            : 'var(--md-sys-color-on-surface)',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                          flex: 1,
+                        }}
+                      >
+                        {tmpl.label}
+                      </span>
+                    </div>
+                    <span
+                      style={{
+                        fontSize: '0.6875rem',
+                        padding: '2px 6px',
+                        borderRadius: '4px',
+                        backgroundColor: 'var(--md-sys-color-surface-variant)',
+                        color: 'var(--md-sys-color-on-surface-variant)',
+                      }}
+                    >
+                      {tmpl.badge}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           {/* Natural Language Complaint Text Area */}
           <div className="md3-textfield">
-            <label className="md3-label">
-              What seems to be the problem? <span style={{ color: 'var(--md-sys-color-error)' }}>*</span>
-            </label>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+              <label className="md3-label" style={{ marginBottom: 0 }}>
+                What seems to be the problem? <span style={{ color: 'var(--md-sys-color-error)' }}>*</span>
+              </label>
+
+              {/* Voice Dictation Button */}
+              <button
+                type="button"
+                onClick={toggleVoiceDictation}
+                className="md3-button-text"
+                style={{
+                  fontSize: '0.75rem',
+                  padding: '4px 10px',
+                  borderRadius: 'var(--md-sys-shape-corner-full)',
+                  backgroundColor: isListening
+                    ? 'var(--md-sys-color-error-container)'
+                    : 'var(--md-sys-color-surface-container-high)',
+                  color: isListening
+                    ? 'var(--md-sys-color-on-error-container)'
+                    : 'var(--md-sys-color-primary)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  border: isListening ? '1px solid var(--md-sys-color-error)' : '1px solid var(--md-sys-color-outline-variant)',
+                  cursor: 'pointer',
+                }}
+              >
+                {isListening ? (
+                  <>
+                    <MicOff size={14} className="spin-icon" />
+                    <span style={{ fontWeight: 700 }}>Listening... Speak now</span>
+                  </>
+                ) : (
+                  <>
+                    <Mic size={14} />
+                    <span>🎙️ Voice Dictate (EN/HI)</span>
+                  </>
+                )}
+              </button>
+            </div>
+
             <textarea
               className="md3-textarea"
               rows={4}
               placeholder="e.g. Water is leaking from the ceiling near Lab 2... or '2nd floor washroom me paani tapak raha hai ceiling se...'"
               value={complaintText}
-              onChange={(e) => setComplaintText(e.target.value)}
+              onChange={(e) => {
+                setComplaintText(e.target.value);
+                if (activeTemplateId) setActiveTemplateId(null);
+              }}
             />
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--md-sys-color-outline)' }}>
               <span>Includes auto-translation & safety hazard analysis</span>
